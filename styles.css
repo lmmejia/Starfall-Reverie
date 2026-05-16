@@ -757,6 +757,126 @@ body {
     linear-gradient(185deg, #020004 0%, #1a0f30 50%, #000010 100%);
 }
 
+.scene-backdrop[data-scene="aftermath"] {
+  background: linear-gradient(180deg, #1a1028 0%, #3a2848 40%, #0d0818 100%);
+}
+
+.scene-backdrop[data-scene="dawnroad"] {
+  background: linear-gradient(185deg, #ffd4a8 0%, #b898c8 35%, #1a1530 75%, #080510 100%);
+}
+
+.scene-backdrop[data-scene="starfield_path"] {
+  background:
+    radial-gradient(circle at 20% 30%, rgb(255 255 255 / 0.12) 0 2%, transparent 3%),
+    radial-gradient(circle at 75% 55%, rgb(200 220 255 / 0.15) 0 2%, transparent 2.5%),
+    linear-gradient(180deg, #06051a 0%, #101838 50%, #020208 100%);
+}
+
+.scene-backdrop[data-scene="horizon_clear"] {
+  background: linear-gradient(180deg, #87b8ff 0%, #ffe8d0 55%, #4a6090 100%);
+}
+
+.scene-backdrop[data-scene="resolution_end"] {
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 20%, rgb(255 240 200 / 0.25) 0%, transparent 55%),
+    linear-gradient(185deg, #0a0614 0%, #2a2050 45%, #0d081c 100%);
+}
+
+/* Full-screen finale after all chapters */
+.screen-the-end {
+  position: relative;
+  width: 100%;
+  min-height: min(72vh, 560px);
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem 1rem 2rem;
+}
+
+.screen-the-end.screen--active {
+  display: flex;
+}
+
+.end-screen-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 12% 20%, rgb(255 255 255 / 0.14) 0 1px, transparent 2px),
+    radial-gradient(circle at 38% 44%, rgb(255 220 200 / 0.12) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 72% 18%, rgb(200 230 255 / 0.1) 0 1px, transparent 2px),
+    radial-gradient(circle at 88% 60%, rgb(255 255 255 / 0.08) 0 1px, transparent 2px),
+    radial-gradient(ellipse 95% 70% at 50% 15%, rgb(255 230 200 / 0.22) 0%, transparent 50%),
+    linear-gradient(188deg, #050308 0%, #1e1438 42%, #0a0818 100%);
+  box-shadow: inset 0 0 80px rgb(255 200 240 / 0.06);
+  pointer-events: none;
+}
+
+.end-screen-card {
+  position: relative;
+  z-index: 1;
+  width: min(560px, 100%);
+  text-align: center;
+  padding: 2rem 1.5rem 1.75rem;
+  background: linear-gradient(155deg, rgb(30 22 48 / 0.92), rgb(12 8 22 / 0.94));
+  border: 4px solid var(--story-panel-edge);
+  border-radius: 14px;
+  box-shadow:
+    0 14px 0 var(--story-shadow),
+    0 0 0 3px #1a1228 inset,
+    0 0 48px rgb(255 160 200 / 0.12);
+}
+
+.end-screen-game-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(9px, 2.4vw, 11px);
+  letter-spacing: 0.12em;
+  color: var(--story-accent-2);
+  margin: 0 0 1.25rem;
+  text-transform: uppercase;
+}
+
+.end-screen-heading {
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(22px, 6vw, 34px);
+  line-height: 1.35;
+  margin: 0 0 1.25rem;
+  color: var(--story-panel-edge);
+  text-shadow:
+    3px 3px 0 #5a1d4a,
+    0 0 28px rgb(255 200 255 / 0.35);
+}
+
+.end-screen-body {
+  margin: 0 0 1rem;
+  font-size: clamp(20px, 2.8vw, 28px);
+  line-height: 1.45;
+  color: var(--story-text);
+}
+
+.end-screen-dedicate {
+  margin: 0 0 1rem;
+  font-size: clamp(18px, 2.4vw, 24px);
+  color: var(--story-accent);
+  opacity: 0.95;
+}
+
+.end-screen-credit {
+  margin: 0 0 1.5rem;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(8px, 2vw, 10px);
+  letter-spacing: 0.08em;
+  color: var(--story-muted);
+  text-transform: uppercase;
+}
+
+.end-screen-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
 .dialogue-box {
   width: min(720px, 100%);
   background: var(--story-panel);

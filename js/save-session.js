@@ -6,7 +6,7 @@
   var CLOUD_AUTH_KEY = "starfall_bb_cloud_auth_v1";
 
   /** @typedef {{ pullsSinceFive: number, pullsSinceFourPlus: number, totalPulls: number }} PitySnap */
-  /** @typedef {{ schemaVersion?: number, playerName?: string, beatIndex?: number, storyChapter?: number, showingEnding?: boolean, unlockIds?: number[], pity?: PitySnap }} SavePayload */
+  /** @typedef {{ schemaVersion?: number, playerName?: string, beatIndex?: number, storyChapter?: number, storyPhase?: string, showingEnding?: boolean, unlockIds?: number[], pity?: PitySnap }} SavePayload */
 
   /** @returns {typeof window.STARFALL_BUTTERBASE} */
   function cfg() {
@@ -161,7 +161,7 @@
     } catch (_) {}
   }
 
-  /** @type {null | (() => { playerName: string, beatIndex: number, storyChapter?: number, showingEnding: boolean, startedStory: boolean })} */
+  /** @type {null | (() => { playerName: string, beatIndex: number, storyChapter?: number, storyPhase?: string, showingEnding: boolean, startedStory: boolean })} */
   var introProvider = null;
 
   /**
@@ -170,6 +170,9 @@
    */
   function inferStartedStoryFromPayload(blob) {
     if (!blob || typeof blob !== "object") return false;
+    var ph = blob.storyPhase;
+    if (ph === "resolution" || ph === "complete" || ph === "ending")
+      return true;
     if (!!blob.showingEnding) return true;
 
     var sch = Number(blob.storyChapter);
@@ -244,6 +247,16 @@
           data.storyChapter <= 3
             ? data.storyChapter
             : 1,
+        storyPhase:
+          typeof data.storyPhase === "string" &&
+          (data.storyPhase === "beats" ||
+            data.storyPhase === "ending" ||
+            data.storyPhase === "resolution" ||
+            data.storyPhase === "complete")
+            ? data.storyPhase
+            : data.showingEnding
+              ? "ending"
+              : "beats",
         showingEnding: !!data.showingEnding,
         startedStory: inferStartedStoryFromPayload(data),
       };
@@ -280,6 +293,17 @@
         intro.storyChapter <= 3
           ? intro.storyChapter
           : 1,
+      storyPhase:
+        intro &&
+        typeof intro.storyPhase === "string" &&
+        (intro.storyPhase === "beats" ||
+          intro.storyPhase === "ending" ||
+          intro.storyPhase === "resolution" ||
+          intro.storyPhase === "complete")
+          ? intro.storyPhase
+          : intro && intro.showingEnding
+            ? "ending"
+            : "beats",
       showingEnding: intro ? !!intro.showingEnding : false,
       startedStory: intro ? !!intro.startedStory : false,
     };
@@ -300,6 +324,7 @@
       playerName: body.playerName,
       beatIndex: body.beatIndex,
       storyChapter: body.storyChapter,
+      storyPhase: body.storyPhase,
       showingEnding: body.showingEnding,
       startedStory: !!body.startedStory,
       schemaVersion: 1,
@@ -384,6 +409,16 @@
             pl.storyChapter <= 3
               ? pl.storyChapter
               : 1,
+          storyPhase:
+            typeof pl.storyPhase === "string" &&
+            (pl.storyPhase === "beats" ||
+              pl.storyPhase === "ending" ||
+              pl.storyPhase === "resolution" ||
+              pl.storyPhase === "complete")
+              ? pl.storyPhase
+              : pl.showingEnding
+                ? "ending"
+                : "beats",
           showingEnding: !!pl.showingEnding,
           unlockIds:
             Array.isArray(pl.unlockIds) &&
@@ -411,6 +446,7 @@
             typeof pl.startedStory === "boolean" ? pl.startedStory : undefined,
           beatIndex: boot.beatIndex,
           showingEnding: boot.showingEnding,
+          storyPhase: boot.storyPhase,
           pity: boot.pity,
           unlockIds: boot.unlockIds,
         });

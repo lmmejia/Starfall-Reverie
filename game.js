@@ -137,6 +137,8 @@
     const c10 = Starfall.WISH_COST_TEN;
     els.pullOne.disabled = warpBusy || cur < c1;
     els.pullTen.disabled = warpBusy || cur < c10;
+    if (els.pullOne) els.pullOne.title = cur < c1 ? "Need " + c1 + " candies" : "Cost: " + c1 + " candies";
+    if (els.pullTen) els.pullTen.title = cur < c10 ? "Need " + c10 + " candies" : "Cost: " + c10 + " candies";
   }
 
   function hud() {
@@ -236,6 +238,13 @@
     const cost = times === 10 ? Starfall.WISH_COST_TEN : Starfall.WISH_COST_SINGLE;
     const cur = Starfall.Persistence.loadCurrency();
     if (cur.stardust < cost) {
+      window.alert(
+        "Not enough candies — you need " +
+          cost +
+          " for this warp (you have " +
+          cur.stardust +
+          ").",
+      );
       hud();
       return;
     }

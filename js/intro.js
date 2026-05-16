@@ -1,6 +1,9 @@
 const SAVE_SCREEN = document.getElementById("screen-save");
 const NAME_SCREEN = document.getElementById("screen-name");
 const STORY_SCREEN = document.getElementById("screen-story");
+const END_SCREEN = document.getElementById("screen-the-end");
+const BTN_END_BACK = document.getElementById("btn-end-back");
+const BTN_END_SAVE_QUIT = document.getElementById("btn-end-save-quit");
 const SHELF_PANEL = document.getElementById("save-shelf-panel");
 const TOP_HINT = document.getElementById("top-phase-hint");
 const NAME_INPUT = document.getElementById("player-name");
@@ -325,6 +328,46 @@ const CHAPTER_3_BEATS = [
   },
 ];
 
+/** Epilogue after defeating Aurel (Chapter 3 only) */
+const CHAPTER_3_RESOLUTION_BEATS = [
+  {
+    speaker: "Narration",
+    text: "The great lens powers down one degree at a time—polite, as if embarrassed. Constellation paint peels in silver threads and drifts like ash, and for once the silence doesn’t applaud.",
+    scene: "aftermath",
+    role: "narration",
+  },
+  {
+    speaker: "{name}",
+    text: "I don’t know if anyone here will thank me. I only know the sky forgot how to lie—and that’s heavier than candy.",
+    scene: "aftermath",
+    role: "player",
+  },
+  {
+    speaker: "Narration",
+    text: "Outside the theater, Candyland keeps smiling because it must. But the flavor thins: sugar on the tongue, truth at the back of the throat.",
+    scene: "dawnroad",
+    role: "narration",
+  },
+  {
+    speaker: "Narration",
+    text: "You walk until the road remembers gravel again—until the stars stop ticking and simply burn, indifferent and kind.",
+    scene: "starfield_path",
+    role: "narration",
+  },
+  {
+    speaker: "{name}",
+    text: "If the city calls me back in dreams, fine. I’ll bring a match, or a question, or just my name—plain as bread, real as dawn.",
+    scene: "starfield_path",
+    role: "player",
+  },
+  {
+    speaker: "Narration",
+    text: "The Eclipse Theater shrinks behind you: a bead of light on the world’s hem. The story doesn’t end clean—only honestly. Wherever you wake next, you carried the seam with you… and that is enough for one last night.",
+    scene: "horizon_clear",
+    role: "narration",
+  },
+];
+
 const CH1_BOARDING_BONUS_KEY = "starfall-ch1-boarding-bonus-v1";
 /** First “evening / tram” beat index — grant bonus candies once when the player reaches it */
 const CH1_STARDUST_BEAT_INDEX = 8;
@@ -370,14 +413,20 @@ const ENDING_SPEAKER_CH3 = "End of chapter three — for now";
 const ENDING_TEXT_CH3 =
   "The painted sky shudders—the planetarium steadies, but you saw the seam: empty space beyond the city’s ceiling. Candies glitter like stray stars in your pocket. The Eclipse Theater bows, yet the last night is never quite over when someone’s still running the lights.";
 
+const FINALE_TEXT =
+  "Thank you for walking through Candyland’s borrowed dreams—and for choosing the road that stays yours. Your allies wait in the Warp; your candies remember every battle. Until the next star falls: travel well.";
+
 let playerName = "Traveler";
 let beatIndex = 0;
 /** Separate from beatIndex — beat 0 can be name-entry or first story line */
 let startedStory = false;
 /** 1 = Golden District, 2 = Sleeping Below, 3 = Eclipse Theater */
 let storyChapter = 1;
-/** "beats" = linear story; "ending" = chapter end card + boss unlock */
-let storyPhase = /** @type {"beats" | "ending"} */ ("beats");
+/**
+ * "beats" = chapter scenes; "ending" = chapter end card + boss; "resolution" = Ch.3 epilogue;
+ * "complete" = finisher card after epilogue.
+ */
+let storyPhase = /** @type {"beats" | "ending" | "resolution" | "complete"} */ ("beats");
 
 if (typeof SaveSession !== "undefined") {
   SaveSession.setIntroProvider(() => {
@@ -391,6 +440,7 @@ if (typeof SaveSession !== "undefined") {
       playerName: nameFromField,
       beatIndex,
       storyChapter,
+      storyPhase,
       showingEnding: storyPhase === "ending",
       startedStory,
     };
@@ -416,13 +466,23 @@ function applyBootIfAny() {
     CHAPTER_1_BEATS.length,
     CHAPTER_2_BEATS.length,
     CHAPTER_3_BEATS.length,
+    CHAPTER_3_RESOLUTION_BEATS.length,
   );
   beatIndex =
     typeof boot.beatIndex === "number"
       ? Math.max(0, Math.min(boot.beatIndex, cap + 5))
       : 0;
-  storyPhase = boot.showingEnding ? "ending" : "beats";
-  const atEnding = storyPhase === "ending";
+  const sp =
+    typeof boot.storyPhase === "string" &&
+    (boot.storyPhase === "beats" ||
+      boot.storyPhase === "ending" ||
+      boot.storyPhase === "resolution" ||
+      boot.storyPhase === "complete")
+      ? boot.storyPhase
+      : boot.showingEnding
+        ? "ending"
+        : "beats";
+  storyPhase = sp;
   startedStory =
     typeof SaveSession !== "undefined" &&
     typeof SaveSession.inferStoryStarted === "function"
@@ -432,7 +492,8 @@ function applyBootIfAny() {
               ? boot.startedStory
               : undefined,
           beatIndex,
-          showingEnding: atEnding,
+          showingEnding: storyPhase === "ending",
+          storyPhase: storyPhase,
           pity:
             typeof Starfall !== "undefined"
               ? Starfall.Persistence.loadPity()
@@ -442,7 +503,12 @@ function applyBootIfAny() {
               ? Starfall.Unlocks.parseUnlockSnapshot()
               : undefined,
         })
-      : !!(beatIndex > 0 || atEnding);
+      : !!(
+          beatIndex > 0 ||
+          storyPhase === "ending" ||
+          storyPhase === "resolution" ||
+          storyPhase === "complete"
+        );
   NAME_INPUT.value = playerName;
   return true;
 }
@@ -452,6 +518,7 @@ function interpolate(text, name) {
 }
 
 function getBeats() {
+  if (storyPhase === "resolution") return CHAPTER_3_RESOLUTION_BEATS;
   if (storyChapter === 1) return CHAPTER_1_BEATS;
   if (storyChapter === 2) return CHAPTER_2_BEATS;
   return CHAPTER_3_BEATS;
@@ -459,11 +526,15 @@ function getBeats() {
 
 /** Which boss fight the battle script should load (story sets this when the boss screen is relevant). */
 function syncBossBattleKey() {
-  if (storyPhase === "ending" && storyChapter === 3) {
+  if (storyPhase !== "ending") {
+    window.__starfallBattle = "conductor";
+    return;
+  }
+  if (storyChapter === 3) {
     window.__starfallBattle = "aurel";
     return;
   }
-  if (storyPhase === "ending" && storyChapter === 2) {
+  if (storyChapter === 2) {
     window.__starfallBattle = "memory";
     return;
   }
@@ -481,6 +552,8 @@ function setTopHint(phase) {
     TOP_HINT.textContent = "Space — next · ← / Backspace — back";
   } else if (phase === "name") {
     TOP_HINT.textContent = "Name yourself, then descend into Candyland…";
+  } else if (phase === "end") {
+    TOP_HINT.textContent = "← / Backspace — back to epilogue · Save anytime to crystals";
   } else {
     TOP_HINT.textContent = "Pick one of three cloud crystals · Butterbase keeps your sleepy progress";
   }
@@ -494,6 +567,10 @@ function activateShelfPhase() {
   NAME_SCREEN.classList.remove("screen--active");
   STORY_SCREEN.hidden = true;
   STORY_SCREEN.classList.remove("screen--active");
+  if (END_SCREEN) {
+    END_SCREEN.hidden = true;
+    END_SCREEN.classList.remove("screen--active");
+  }
   if (bootGhost) bootGhost.dataset.phase = "shelf";
   setTopHint("shelf");
 }
@@ -505,6 +582,10 @@ function activateNamePhase() {
   NAME_SCREEN.classList.add("screen--active");
   STORY_SCREEN.hidden = true;
   STORY_SCREEN.classList.remove("screen--active");
+  if (END_SCREEN) {
+    END_SCREEN.hidden = true;
+    END_SCREEN.classList.remove("screen--active");
+  }
   if (bootGhost) bootGhost.dataset.phase = "name";
   setTopHint("name");
 }
@@ -516,12 +597,54 @@ function activateStoryPhase() {
   NAME_SCREEN.classList.remove("screen--active");
   STORY_SCREEN.hidden = false;
   STORY_SCREEN.classList.add("screen--active");
+  if (END_SCREEN) {
+    END_SCREEN.hidden = true;
+    END_SCREEN.classList.remove("screen--active");
+  }
   if (bootGhost) bootGhost.dataset.phase = "story";
   setTopHint("story");
 }
 
+function activateEndScreenPhase() {
+  if (!SAVE_SCREEN || !NAME_SCREEN || !STORY_SCREEN || !END_SCREEN) return;
+  SAVE_SCREEN.hidden = true;
+  SAVE_SCREEN.classList.remove("screen--active");
+  NAME_SCREEN.hidden = true;
+  NAME_SCREEN.classList.remove("screen--active");
+  STORY_SCREEN.hidden = true;
+  STORY_SCREEN.classList.remove("screen--active");
+  END_SCREEN.hidden = false;
+  END_SCREEN.classList.add("screen--active");
+  if (bootGhost) bootGhost.dataset.phase = "end";
+  setTopHint("end");
+}
+
+function refreshEndScreenCopy() {
+  const body = document.getElementById("end-screen-body");
+  const dedicate = document.getElementById("end-screen-dedicate");
+  if (body) body.textContent = FINALE_TEXT;
+  if (dedicate) {
+    const n = (playerName || "").trim();
+    if (n && n !== "Traveler") {
+      dedicate.hidden = false;
+      dedicate.textContent = `Safe travels, ${n}.`;
+    } else {
+      dedicate.hidden = true;
+      dedicate.textContent = "";
+    }
+  }
+}
+
 function updateChapterPill() {
   if (!CHAPTER_PILL) return;
+  if (storyPhase === "complete") {
+    CHAPTER_PILL.textContent = "Finale — Complete";
+    return;
+  }
+  if (storyPhase === "resolution") {
+    CHAPTER_PILL.textContent = "Finale — After the eclipse";
+    return;
+  }
   if (storyChapter === 1) CHAPTER_PILL.textContent = "Ch. 1 — The Golden District";
   else if (storyChapter === 2) CHAPTER_PILL.textContent = "Ch. 2 — The Sleeping Below";
   else CHAPTER_PILL.textContent = "Ch. 3 — The Eclipse Theater";
@@ -573,7 +696,10 @@ function updateNav() {
   if (BTN_ADVANCE) {
     let block = false;
     let title = "";
-    if (storyPhase === "ending") {
+    if (storyPhase === "complete") {
+      block = true;
+      title = "The journey is complete — thank you for playing.";
+    } else if (storyPhase === "ending") {
       if (storyChapter === 1 && !isChapterBossBeaten(1)) {
         block = true;
         title = "Win the boss battle against the Conductor to unlock Chapter 2.";
@@ -582,7 +708,7 @@ function updateNav() {
         title = "Win the boss battle against the Memory Beast to unlock Chapter 3.";
       } else if (storyChapter === 3 && !isChapterBossBeaten(3)) {
         block = true;
-        title = "Win the boss battle against Aurel to see the finale card through.";
+        title = "Win the boss battle against Aurel to continue the finale.";
       }
     }
     BTN_ADVANCE.disabled = block;
@@ -622,8 +748,13 @@ function grantChapterThreeDomeBonusOnce() {
 
 function renderStory() {
   updateChapterPill();
-  if (storyPhase === "ending") {
+  if (storyPhase === "complete") {
+    activateEndScreenPhase();
+    refreshEndScreenCopy();
+  } else if (storyPhase === "ending") {
     applyEnding();
+  } else if (storyPhase === "resolution") {
+    applyBeat();
   } else {
     applyBeat();
     grantChapterOneBoardingBonusOnce();
@@ -673,6 +804,20 @@ function quitToShelfAfterSave(/** @type {HTMLButtonElement | null} */ triggerBtn
 
 function advance() {
   if (isGachaOpen() || isBossOpen()) return;
+  if (storyPhase === "resolution") {
+    const rb = CHAPTER_3_RESOLUTION_BEATS;
+    if (beatIndex >= rb.length - 1) {
+      storyPhase = "complete";
+      beatIndex = 0;
+      renderStory();
+      scheduleCloudSave();
+      return;
+    }
+    beatIndex += 1;
+    renderStory();
+    scheduleCloudSave();
+    return;
+  }
   if (storyPhase === "ending") {
     if (storyChapter === 1) {
       if (!isChapterBossBeaten(1)) return;
@@ -692,6 +837,11 @@ function advance() {
     }
     if (storyChapter === 3) {
       if (!isChapterBossBeaten(3)) return;
+      storyPhase = "resolution";
+      beatIndex = 0;
+      renderStory();
+      scheduleCloudSave();
+      return;
     }
     return;
   }
@@ -709,6 +859,27 @@ function advance() {
 
 function goBack() {
   if (isGachaOpen() || isBossOpen()) return;
+  if (storyPhase === "complete") {
+    storyPhase = "resolution";
+    beatIndex = CHAPTER_3_RESOLUTION_BEATS.length - 1;
+    activateStoryPhase();
+    renderStory();
+    scheduleCloudSave();
+    return;
+  }
+  if (storyPhase === "resolution") {
+    if (beatIndex <= 0) {
+      storyPhase = "ending";
+      beatIndex = CHAPTER_3_BEATS.length - 1;
+      renderStory();
+      scheduleCloudSave();
+      return;
+    }
+    beatIndex -= 1;
+    renderStory();
+    scheduleCloudSave();
+    return;
+  }
   if (storyPhase === "ending") {
     storyPhase = "beats";
     renderStory();
@@ -844,8 +1015,12 @@ function hydrateFromCloudContinuation() {
   const hadBoot = applyBootIfAny();
   if (hadBoot) {
     if (startedStory) {
-      activateStoryPhase();
-      renderStory();
+      if (storyPhase === "complete") {
+        renderStory();
+      } else {
+        activateStoryPhase();
+        renderStory();
+      }
     } else {
       activateNamePhase();
     }
@@ -918,8 +1093,24 @@ if (BTN_NAME_SAVE_QUIT && typeof SaveSession !== "undefined") {
 BTN_ADVANCE.addEventListener("click", advance);
 BTN_BACK.addEventListener("click", goBack);
 
+if (BTN_END_BACK) BTN_END_BACK.addEventListener("click", goBack);
+
+if (BTN_END_SAVE_QUIT && typeof SaveSession !== "undefined") {
+  BTN_END_SAVE_QUIT.addEventListener("click", () => {
+    quitToShelfAfterSave(BTN_END_SAVE_QUIT);
+  });
+}
+
 document.addEventListener("keydown", (e) => {
-  if (!STORY_SCREEN.classList.contains("screen--active") || isGachaOpen() || isBossOpen()) {
+  if (isGachaOpen() || isBossOpen()) return;
+  if (END_SCREEN && END_SCREEN.classList.contains("screen--active")) {
+    if (e.code === "ArrowLeft" || e.code === "Backspace") {
+      e.preventDefault();
+      goBack();
+    }
+    return;
+  }
+  if (!STORY_SCREEN.classList.contains("screen--active")) {
     return;
   }
   if (e.code === "Space") {

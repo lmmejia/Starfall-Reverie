@@ -99,6 +99,30 @@
             </div>
           </div>
         </section>
+
+        <section id="screen-the-end" class="screen screen-the-end" aria-label="End of game" hidden>
+          <div class="end-screen-backdrop" aria-hidden="true"></div>
+          <div class="end-screen-card">
+            <p class="end-screen-game-title">Starfall Reverie</p>
+            <h1 class="end-screen-heading">The End</h1>
+            <p id="end-screen-body" class="end-screen-body"></p>
+            <p id="end-screen-dedicate" class="end-screen-dedicate" hidden></p>
+            <p class="end-screen-credit">Thank you for playing</p>
+            <div class="end-screen-actions">
+              <button id="btn-end-back" type="button" class="story-btn story-btn-ghost">
+                Back to epilogue
+              </button>
+              <button
+                id="btn-end-save-quit"
+                type="button"
+                class="story-btn story-btn-ghost btn-save-quit"
+                title="Save to cloud and return to save crystals"
+              >
+                Save &amp; quit to crystals
+              </button>
+            </div>
+          </div>
+        </section>
       </main>
 
       <button
@@ -129,7 +153,7 @@
               Starfall Reverie
             </div>
             <div class="top-stats">
-              <div class="pill" title="Currency for wishes — 1 candy per Warp ×1, 10 for Warp ×10">
+              <div class="pill" title="Warp costs 50 candies per pull, 500 for ten.">
                 <span class="label">Candies</span>
                 <strong id="currency">0</strong>
               </div>
@@ -159,8 +183,8 @@
           </section>
 
           <div class="actions">
-            <button type="button" class="btn primary" id="pull-one">Warp ×1</button>
-            <button type="button" class="btn" id="pull-ten">Warp ×10</button>
+            <button type="button" class="btn primary" id="pull-one">Warp ×1 — 50</button>
+            <button type="button" class="btn" id="pull-ten">Warp ×10 — 500</button>
           </div>
 
           <details class="vault-panel">
@@ -179,7 +203,7 @@
           </details>
 
           <footer class="footnote">
-            Each wish costs <strong>1</strong> candy; Warp ×10 costs <strong>10</strong> candies. Story
+            Each wish costs <strong>50</strong> candies; Warp ×10 costs <strong>500</strong> candies. Story
             milestones can grant more. Pity: guaranteed <strong>4★</strong> by the 10th pull without one;
             guaranteed <strong>5★</strong> on the 80th pull since your last 5★.
           </footer>
