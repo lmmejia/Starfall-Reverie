@@ -79,6 +79,13 @@
       rarity: 5,
       bossOnly: true,
     },
+    {
+      id: 9003,
+      name: "Aurel",
+      role: "Dreamkeeper of the Last Night",
+      rarity: 5,
+      bossOnly: true,
+    },
   ];
 
   /** @returns {Character | undefined} */

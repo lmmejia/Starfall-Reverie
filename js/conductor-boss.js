@@ -1,6 +1,6 @@
 /* global Starfall */
 /**
- * Boss lanes — Conductor of Smiles (Ch.1) & Memory Beast (Ch.2). Theme driven via window.__starfallBattle.
+ * Boss lanes — Conductor, Memory Beast, Aurel. Theme via window.__starfallBattle.
  */
 (() => {
   const W = 360;
@@ -26,10 +26,12 @@
   const BATTLE_ALLY_KEY = "starfall-reverie-battle-ally-v1";
 
   function getBattleKey() {
-    return window.__starfallBattle === "memory" ? "memory" : "conductor";
+    if (window.__starfallBattle === "memory") return "memory";
+    if (window.__starfallBattle === "aurel") return "aurel";
+    return "conductor";
   }
 
-  /** @param {"conductor"|"memory"} key */
+  /** @param {"conductor"|"memory"|"aurel"} key */
   function battleTheme(key) {
     return THEME[key] || THEME.conductor;
   }
@@ -188,6 +190,83 @@
       hurtParticle: ["#9b6dff", "#c9b3ff", "#fff"],
       victoryParticles: ["#c9b3ff", "#7fd9c8", "#ffe08a"],
     },
+    aurel: {
+      bossId: 9003,
+      victoryStardust: 45,
+      modalTitle: "Aurel, Dreamkeeper of the Last Night",
+      phase1Label: "Phase 1 — Painted sky",
+      phase2Label: "Phase 2 — The false sky splits",
+      prepSub: "The dome is safe until countdown ends—then the eclipse runs hot",
+      playHint:
+        "Build hype with strikes. Gold flare = falling star bolt. Eclipse sweep: two lanes burn with corona bands. Stand in the violet STILL lane when you see ORBIT above.",
+      encoreHudMsg: "The planetarium tears open—faster sweeps, raw void behind the glass!",
+      encoreCaption: "There—that’s what’s outside the city. Still want the truth?",
+      victoryHud: "The great machine falters—you’ve broken the last clean night.",
+      victoryTitle: "The lens cracks",
+      victoryBlurb:
+        "Aurel’s smile doesn’t break; only the sky does, for a heartbeat. Candies fall like cooling sparks—the theater exhales, and somewhere, a real star tries to answer.",
+      defeatHud: "The house lights forgive you. Try again when the eclipse calls.",
+      defeatTitle: "Curtain on courage",
+      defeatBlurb:
+        "The dome seals shut again. The painted constellations realign, polite as ever—and the empty seats sound almost relieved.",
+      warmupHud: "Planetarium safe-mode — you can’t be hurt during countdown",
+      briefingTitle: "Before the eclipse",
+      briefingLead:
+        "Final arena: same lanes and hype as before, same Warp ally bonuses. You get a full prep countdown—use it. Aurel fights like the sky itself owes her money.",
+      briefingItems: [
+        `<strong>Movement unchanged</strong>: <kbd>A</kbd> / <kbd>D</kbd> / <kbd>W</kbd> center; you’re still the <strong>cyan circle</strong>.`,
+        `<strong>Gold flare</strong> telegraphs a <strong>star bolt</strong> down one lane—step clear before it strikes.`,
+        `<strong>Eclipse sweep</strong>: two lanes fill with <strong>corona fire</strong>. The calm lane glows <strong>violet</strong> marked <strong>STILL</strong>. When <strong>ORBIT</strong> shows, get into STILL—then a <strong>sweep mass</strong> crashes the burning lanes.`,
+        `<strong>Hype & crits</strong> still shatter her guard. Getting hit drains your nerve—and she loves it.`,
+        `Watch for <strong>twin bolts</strong> and <strong>star flurries</strong>.`,
+        `<strong>Phase 2</strong> below half HP—the fake sky breaks; patterns speed up and telegraphs shorten.`,
+      ],
+      taunts: [
+        "Admire the ceiling—rent is due in applause.",
+        "Every lane you doubt becomes my spotlight.",
+        "That hesitation? I’ll file it under ‘sequel bait.’",
+        "The void isn’t cruel; it’s just poorly marketed.",
+        "Crowd’s thin tonight—guess who’s the whole city.",
+      ],
+      captionTrain:
+        "Corona lanes soon—one mind-path stays STILL under the ORBIT.",
+      captionDouble: "Twin bolts—same lane, twice.",
+      captionFlurry: "Meteor spill—don’t stand still in the wrong lane.",
+      streakCaption: "The machine stutters—shatter the lens!",
+      hurtCaption: "The eclipse clipped you—hype dims.",
+      losePendingHud: "Hold still—let the sweep pass…",
+      trainTopLabel: "ORBIT",
+      safeLabel: "STILL",
+      noteTeleRgb: "255 200 120",
+      noteOrb: "#ffcc66",
+      noteHighlight: "#fff8e0",
+      trainWarnRgb: "255 120 60",
+      trainDashRgb: "255 220 140",
+      trainChargeBody: "#4a3080",
+      trainChargeWindow: "#ffd27a",
+      trainChargeRoof: "#1a0a28",
+      trainChargeLight: "#a78bfa",
+      safeFillRgb: "140 100 220",
+      safeStrokeRgb: "200 170 255",
+      safeTextRgb: "235 220 255",
+      encoreFlash0: "#2a1840",
+      encoreFlash1: "rgb(80 40 120 / 0.35)",
+      starWarm: "rgb(255 200 120 / 0.2)",
+      starCool: "rgb(160 200 255 / 0.14)",
+      laneStroke: "rgb(255 220 180 / 0.12)",
+      bg0: "#0a0614",
+      bg1: "#1a0f32",
+      bg2: "#020008",
+      captionBoxStroke: "rgb(255 200 140 / 0.45)",
+      captionText: "#ffeccc",
+      prepBorderRgb: "200 160 255",
+      prepTitle: "#f5e6ff",
+      prepSubRgb: "200 180 220",
+      strikeParticleCrit: ["#ffe08a", "#ffcc18", "#a78bfa"],
+      strikeParticleNorm: ["#7ee8ff", "#ffcc66", "#fff"],
+      hurtParticle: ["#ff8860", "#ffd27a", "#fff"],
+      victoryParticles: ["#ffcc66", "#a78bfa", "#7ee8ff"],
+    },
   };
 
   /** @type {HTMLDialogElement | null} */
@@ -285,11 +364,15 @@
     beep(120, 0.25, "square", 0.035);
   }
 
-  /** @param {"conductor"|"memory"} bk */
+  /** @param {"conductor"|"memory"|"aurel"} bk */
   function sfxTrainForBattle(bk) {
     if (bk === "memory") {
       beep(95, 0.28, "sawtooth", 0.055);
       beep(60, 0.32, "sawtooth", 0.04);
+    } else if (bk === "aurel") {
+      beep(330, 0.12, "square", 0.05);
+      beep(220, 0.22, "triangle", 0.045);
+      beep(495, 0.1, "square", 0.035);
     } else {
       sfxTrain();
     }
@@ -717,7 +800,10 @@
       window.dispatchEvent(
         new CustomEvent("starfall-chapter-boss-beaten", {
           bubbles: true,
-          detail: { chapter: state.battleKey === "memory" ? 2 : 1 },
+          detail: {
+            chapter:
+              state.battleKey === "memory" ? 2 : state.battleKey === "aurel" ? 3 : 1,
+          },
         }),
       );
     } catch (_) {}
@@ -906,7 +992,7 @@
           ctx.shadowColor = th.noteOrb;
           ctx.shadowBlur = 10;
           ctx.fillStyle = th.noteOrb;
-          if (state.battleKey === "memory") {
+          if (state.battleKey !== "conductor") {
             ctx.save();
             ctx.translate(cx, a.y);
             ctx.rotate(Math.PI / 4);
@@ -1069,7 +1155,9 @@
           const goLine =
             state.battleKey === "memory"
               ? "AWAKE — cut through the fog!"
-              : "GO — juice the crowd!";
+              : state.battleKey === "aurel"
+                ? "RISE — break the painted sky!"
+                : "GO — juice the crowd!";
           hudMsg.textContent =
             n >= 1 ? "Countdown: " + n + " — warm up those keys!" : goLine;
         }

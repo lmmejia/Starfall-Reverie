@@ -699,6 +699,64 @@ body {
     linear-gradient(180deg, #06040c 0%, #1f1440 55%, #020308 100%);
 }
 
+.scene-backdrop[data-scene="ascent"] {
+  background: linear-gradient(195deg, #1a1030 0%, #3d2060 40%, #ffd8a8 85%, #2a1830 100%);
+}
+
+.scene-backdrop[data-scene="rotunda"] {
+  background:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgb(255 220 180 / 0.15) 0%, transparent 55%),
+    linear-gradient(180deg, #0c0818 0%, #241845 50%, #080510 100%);
+}
+
+.scene-backdrop[data-scene="planetarium"] {
+  background:
+    radial-gradient(circle at 50% 35%, rgb(120 200 255 / 0.12) 0 25%, transparent 28%),
+    linear-gradient(180deg, #05040e 0%, #1a1238 60%, #020208 100%);
+}
+
+.scene-backdrop[data-scene="orrery"] {
+  background:
+    repeating-conic-gradient(
+      from 0deg at 50% 120%,
+      rgb(40 30 80 / 0.25) 0deg,
+      transparent 8deg,
+      transparent 18deg,
+      rgb(60 40 100 / 0.2) 22deg
+    ),
+    linear-gradient(180deg, #080618 0%, #201850 100%);
+}
+
+.scene-backdrop[data-scene="veil"] {
+  background: radial-gradient(ellipse 80% 50% at 50% 50%, rgb(180 80 60 / 0.22) 0%, transparent 55%),
+    linear-gradient(185deg, #120818 0%, #3a1028 45%, #060410 100%);
+}
+
+.scene-backdrop[data-scene="eclipse"] {
+  background:
+    radial-gradient(circle at 50% 45%, transparent 0 35%, rgb(20 10 40 / 0.95) 36%),
+    radial-gradient(circle at 50% 42%, rgb(255 200 120 / 0.35) 0 15%, transparent 16%),
+    linear-gradient(180deg, #020008 0%, #1a0a28 100%);
+}
+
+.scene-backdrop[data-scene="hollow"] {
+  background: radial-gradient(ellipse 70% 45% at 50% 40%, rgb(30 40 80 / 0.4) 0%, transparent 50%),
+    linear-gradient(180deg, #000008 0%, #0a0614 100%);
+}
+
+.scene-backdrop[data-scene="aurel"] {
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 30%, rgb(200 160 255 / 0.25) 0%, transparent 50%),
+    linear-gradient(180deg, #080014 0%, #301860 55%, #040010 100%);
+}
+
+.scene-backdrop[data-scene="eclipse_finale"] {
+  background:
+    radial-gradient(circle at 50% 25%, rgb(255 210 160 / 0.12) 0 20%, transparent 22%),
+    radial-gradient(ellipse 100% 80% at 50% 100%, rgb(40 20 80 / 0.5) 0%, transparent 45%),
+    linear-gradient(185deg, #020004 0%, #1a0f30 50%, #000010 100%);
+}
+
 .dialogue-box {
   width: min(720px, 100%);
   background: var(--story-panel);

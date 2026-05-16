@@ -223,6 +223,94 @@ const CHAPTER_2_BEATS = [
   },
 ];
 
+/** Chapter 3 — The Eclipse Theater */
+const CHAPTER_3_BEATS = [
+  {
+    speaker: "Narration",
+    text: "You surface from the deep as if through syrup—each breath thinner, each lie brighter. Above you, something vast eclipses the city’s sugar-light.",
+    scene: "ascent",
+    role: "narration",
+  },
+  {
+    speaker: "…",
+    text: "The stars here don’t twinkle; they tick. Constellations redraw themselves when you look away, polite as ushers closing the wrong door.",
+    scene: "ascent",
+    role: "narration",
+  },
+  {
+    speaker: "{name}",
+    text: "I know this feeling: being shown a sky I’m not supposed to test.",
+    scene: "rotunda",
+    role: "player",
+  },
+  {
+    speaker: "Narration",
+    text: "The Eclipse Theater rises like a planetarium that swallowed a cathedral—black glass ribs, a dome that pretends to be night, and rows of empty seats that still applaud on cue.",
+    scene: "rotunda",
+    role: "narration",
+  },
+  {
+    speaker: "Projectionist",
+    text: "House lights are policy. Don’t touch the lens—it’s how we keep the city’s dreams on-brand.",
+    scene: "planetarium",
+    role: "major",
+  },
+  {
+    speaker: "Narration",
+    text: "Inside, the machine hums: lenses grinding faintly, lamps cooling the color out of everything until the world looks like a rehearsal for forgiveness.",
+    scene: "planetarium",
+    role: "narration",
+  },
+  {
+    speaker: "Hollow chorus",
+    text: "Bravo… bravo… bravo…",
+    scene: "orrery",
+    role: "minor",
+  },
+  {
+    speaker: "{name}",
+    text: "The orrery overhead isn’t planets—it’s Candyland in miniature, a toy sky on wires. Outside the dome I swear there’s nothing—but this place won’t show it.",
+    scene: "orrery",
+    role: "player",
+  },
+  {
+    speaker: "Narration",
+    text: "Shadows sharpen into velvet as the fake horizon rouges, then drains—an eclipse painted in layers until even regret looks staged.",
+    scene: "veil",
+    role: "narration",
+  },
+  {
+    speaker: "Narration",
+    text: "At center stage, the planetarium’s heart spins: glass worlds on threads, light bleeding through cracks you’re not meant to notice.",
+    scene: "eclipse",
+    role: "narration",
+  },
+  {
+    speaker: "Narration",
+    text: "The dome shivers. For a heartbeat, the painted stars misalign—and through the seam, not black, but emptiness without even a name for dark.",
+    scene: "hollow",
+    role: "narration",
+  },
+  {
+    speaker: "Aurel",
+    text: "You made it to the last night. Good. I prefer witnesses who understand the sky is a service—and I’m the one still on call.",
+    scene: "aurel",
+    role: "major",
+  },
+  {
+    speaker: "{name}",
+    text: "You’re not keeping dreams—you’re curating excuses. This city sleeps because you sell them a prettier ceiling.",
+    scene: "aurel",
+    role: "player",
+  },
+  {
+    speaker: "Aurel",
+    text: "Call it mercy. When the illusion holds, nobody has to see what’s outside. When it breaks—well. That’s Act Two.",
+    scene: "aurel",
+    role: "major",
+  },
+];
+
 const CH1_BOARDING_BONUS_KEY = "starfall-ch1-boarding-bonus-v1";
 /** First “evening / tram” beat index — grant bonus candies once when the player reaches it */
 const CH1_STARDUST_BEAT_INDEX = 8;
@@ -231,12 +319,25 @@ const CH2_POD_BONUS_KEY = "starfall-ch2-pod-bonus-v1";
 /** Beat where the dream pods are first shown in force */
 const CH2_POD_BONUS_BEAT_INDEX = 3;
 
+const CH3_DOME_BONUS_KEY = "starfall-ch3-planetarium-bonus-v1";
+/** Inside the planetarium — first strong machine beat */
+const CH3_DOME_BONUS_BEAT_INDEX = 5;
+
 const CH1_BOSS_BEATEN_KEY = "starfall-reverie-ch1-boss-beaten-v1";
 const CH2_BOSS_BEATEN_KEY = "starfall-reverie-ch2-boss-beaten-v1";
+const CH3_BOSS_BEATEN_KEY = "starfall-reverie-ch3-boss-beaten-v1";
 
-/** @param {number} chapter 1 or 2 */
+/** @param {number} chapter 1, 2, or 3 */
 function isChapterBossBeaten(chapter) {
-  const k = chapter === 1 ? CH1_BOSS_BEATEN_KEY : CH2_BOSS_BEATEN_KEY;
+  const k =
+    chapter === 1
+      ? CH1_BOSS_BEATEN_KEY
+      : chapter === 2
+        ? CH2_BOSS_BEATEN_KEY
+        : chapter === 3
+          ? CH3_BOSS_BEATEN_KEY
+          : null;
+  if (!k) return false;
   return localStorage.getItem(k) === "1";
 }
 
@@ -251,9 +352,13 @@ const ENDING_SPEAKER_CH2 = "End of chapter two — for now";
 const ENDING_TEXT_CH2 =
   "The Beast scatters into threadbare mist—not gone, only unwound for a moment. The pods dim, but the chamber remembers you. Candies earned in the deep stain your pockets like cold embers—use them if you dare climb back toward waking air.";
 
+const ENDING_SPEAKER_CH3 = "End of chapter three — for now";
+const ENDING_TEXT_CH3 =
+  "The painted sky shudders—the planetarium steadies, but you saw the seam: empty space beyond the city’s ceiling. Candies glitter like stray stars in your pocket. The Eclipse Theater bows, yet the last night is never quite over when someone’s still running the lights.";
+
 let playerName = "Traveler";
 let beatIndex = 0;
-/** 1 = Golden District, 2 = Sleeping Below */
+/** 1 = Golden District, 2 = Sleeping Below, 3 = Eclipse Theater */
 let storyChapter = 1;
 /** "beats" = linear story; "ending" = chapter end card + boss unlock */
 let storyPhase = /** @type {"beats" | "ending"} */ ("beats");
@@ -263,13 +368,22 @@ function interpolate(text, name) {
 }
 
 function getBeats() {
-  return storyChapter === 1 ? CHAPTER_1_BEATS : CHAPTER_2_BEATS;
+  if (storyChapter === 1) return CHAPTER_1_BEATS;
+  if (storyChapter === 2) return CHAPTER_2_BEATS;
+  return CHAPTER_3_BEATS;
 }
 
 /** Which boss fight the battle script should load (story sets this when the boss screen is relevant). */
 function syncBossBattleKey() {
-  window.__starfallBattle =
-    storyPhase === "ending" && storyChapter === 2 ? "memory" : "conductor";
+  if (storyPhase === "ending" && storyChapter === 3) {
+    window.__starfallBattle = "aurel";
+    return;
+  }
+  if (storyPhase === "ending" && storyChapter === 2) {
+    window.__starfallBattle = "memory";
+    return;
+  }
+  window.__starfallBattle = "conductor";
 }
 
 /** @param {SpeakerRole} role */
@@ -286,8 +400,9 @@ function showScreen(story) {
 
 function updateChapterPill() {
   if (!CHAPTER_PILL) return;
-  CHAPTER_PILL.textContent =
-    storyChapter === 1 ? "Ch. 1 — The Golden District" : "Ch. 2 — The Sleeping Below";
+  if (storyChapter === 1) CHAPTER_PILL.textContent = "Ch. 1 — The Golden District";
+  else if (storyChapter === 2) CHAPTER_PILL.textContent = "Ch. 2 — The Sleeping Below";
+  else CHAPTER_PILL.textContent = "Ch. 3 — The Eclipse Theater";
 }
 
 function applyBeat() {
@@ -300,9 +415,23 @@ function applyBeat() {
 }
 
 function applyEnding() {
-  const speaker = storyChapter === 1 ? ENDING_SPEAKER_CH1 : ENDING_SPEAKER_CH2;
-  const text = storyChapter === 1 ? ENDING_TEXT_CH1 : ENDING_TEXT_CH2;
-  BACKDROP.dataset.scene = storyChapter === 1 ? "stage" : "beast";
+  let speaker;
+  let text;
+  let scene;
+  if (storyChapter === 1) {
+    speaker = ENDING_SPEAKER_CH1;
+    text = ENDING_TEXT_CH1;
+    scene = "stage";
+  } else if (storyChapter === 2) {
+    speaker = ENDING_SPEAKER_CH2;
+    text = ENDING_TEXT_CH2;
+    scene = "beast";
+  } else {
+    speaker = ENDING_SPEAKER_CH3;
+    text = ENDING_TEXT_CH3;
+    scene = "eclipse_finale";
+  }
+  BACKDROP.dataset.scene = scene;
   setSpeakerRole(ENDING_ROLE);
   SPEAKER_EL.textContent = speaker;
   LINE_EL.textContent = text;
@@ -315,18 +444,27 @@ function updateNav() {
   BTN_BACK.disabled = atFirstBeatCh1;
   if (BTN_BOSS_FIGHT) {
     BTN_BOSS_FIGHT.hidden = storyPhase !== "ending";
-    BTN_BOSS_FIGHT.textContent =
-      storyChapter === 2
-        ? "Face the Memory Beast (battle)"
-        : "Face the Conductor (battle)";
+    if (storyChapter === 1) BTN_BOSS_FIGHT.textContent = "Face the Conductor (battle)";
+    else if (storyChapter === 2) BTN_BOSS_FIGHT.textContent = "Face the Memory Beast (battle)";
+    else BTN_BOSS_FIGHT.textContent = "Face Aurel (battle)";
   }
   if (BTN_ADVANCE) {
-    const needCh1Boss =
-      storyPhase === "ending" && storyChapter === 1 && !isChapterBossBeaten(1);
-    BTN_ADVANCE.disabled = needCh1Boss;
-    BTN_ADVANCE.title = needCh1Boss
-      ? "Win the boss battle against the Conductor to unlock Chapter 2."
-      : "";
+    let block = false;
+    let title = "";
+    if (storyPhase === "ending") {
+      if (storyChapter === 1 && !isChapterBossBeaten(1)) {
+        block = true;
+        title = "Win the boss battle against the Conductor to unlock Chapter 2.";
+      } else if (storyChapter === 2 && !isChapterBossBeaten(2)) {
+        block = true;
+        title = "Win the boss battle against the Memory Beast to unlock Chapter 3.";
+      } else if (storyChapter === 3 && !isChapterBossBeaten(3)) {
+        block = true;
+        title = "Win the boss battle against Aurel to see the finale card through.";
+      }
+    }
+    BTN_ADVANCE.disabled = block;
+    BTN_ADVANCE.title = title;
   }
 }
 
@@ -350,6 +488,16 @@ function grantChapterTwoPodBonusOnce() {
   localStorage.setItem(CH2_POD_BONUS_KEY, "1");
 }
 
+function grantChapterThreeDomeBonusOnce() {
+  if (typeof Starfall === "undefined") return;
+  if (storyPhase === "ending") return;
+  if (storyChapter !== 3) return;
+  if (beatIndex !== CH3_DOME_BONUS_BEAT_INDEX) return;
+  if (localStorage.getItem(CH3_DOME_BONUS_KEY)) return;
+  Starfall.Persistence.addStardust(35);
+  localStorage.setItem(CH3_DOME_BONUS_KEY, "1");
+}
+
 function renderStory() {
   updateChapterPill();
   if (storyPhase === "ending") {
@@ -358,6 +506,7 @@ function renderStory() {
     applyBeat();
     grantChapterOneBoardingBonusOnce();
     grantChapterTwoPodBonusOnce();
+    grantChapterThreeDomeBonusOnce();
   }
   updateNav();
 }
@@ -371,6 +520,18 @@ function advance() {
       beatIndex = 0;
       storyPhase = "beats";
       renderStory();
+      return;
+    }
+    if (storyChapter === 2) {
+      if (!isChapterBossBeaten(2)) return;
+      storyChapter = 3;
+      beatIndex = 0;
+      storyPhase = "beats";
+      renderStory();
+      return;
+    }
+    if (storyChapter === 3) {
+      if (!isChapterBossBeaten(3)) return;
     }
     return;
   }
@@ -392,6 +553,12 @@ function goBack() {
     return;
   }
   if (beatIndex <= 0) {
+    if (storyChapter === 3) {
+      storyChapter = 2;
+      storyPhase = "ending";
+      renderStory();
+      return;
+    }
     if (storyChapter === 2) {
       storyChapter = 1;
       storyPhase = "ending";
@@ -413,6 +580,7 @@ BTN_BEGIN.addEventListener("click", () => {
   try {
     localStorage.removeItem(CH1_BOSS_BEATEN_KEY);
     localStorage.removeItem(CH2_BOSS_BEATEN_KEY);
+    localStorage.removeItem(CH3_BOSS_BEATEN_KEY);
   } catch (_) {}
   showScreen(true);
   renderStory();
@@ -427,7 +595,9 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.code === "Space") {
     e.preventDefault();
-    advance();
+    if (!BTN_ADVANCE.disabled) {
+      advance();
+    }
   }
   if (e.code === "ArrowLeft" || e.code === "Backspace") {
     e.preventDefault();
@@ -450,6 +620,7 @@ window.addEventListener("starfall-chapter-boss-beaten", (e) => {
   try {
     if (ch === 1) localStorage.setItem(CH1_BOSS_BEATEN_KEY, "1");
     else if (ch === 2) localStorage.setItem(CH2_BOSS_BEATEN_KEY, "1");
+    else if (ch === 3) localStorage.setItem(CH3_BOSS_BEATEN_KEY, "1");
   } catch (_) {}
   if (STORY_SCREEN.classList.contains("screen--active")) {
     updateNav();
