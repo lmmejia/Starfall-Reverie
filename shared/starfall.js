@@ -1,13 +1,55 @@
 /**
  * Starfall Reverie — shared runtime for gacha + battle scenes.
+ * Player-facing currency is **Candies**; balances are stored in localStorage as `stardust` for compatibility.
  * Load before your game scripts: <script src="shared/starfall.js"></script>
  * Use: Starfall.getCharacter(id), Starfall.drawPortrait(canvas, char), Starfall.Unlocks.*
  */
 (function () {
   const UNLOCK_STORAGE = "starfall-reverie-unlocks-v1";
   const PITY_STORAGE = "starfall-reverie-pity-v1";
+  const CURRENCY_STORAGE = "starfall-reverie-stardust-v1";
 
-  /** @typedef {{ id: number, name: string, role: string, rarity: 3 | 4 | 5 }} Character */
+  /** @typedef {{ stardust: number }} CurrencySnap */
+
+  const DEFAULT_STARTING_STARDUST = 200;
+
+  function loadCurrency() {
+    try {
+      const raw = localStorage.getItem(CURRENCY_STORAGE);
+      if (!raw) {
+        return { stardust: DEFAULT_STARTING_STARDUST };
+      }
+      const o = JSON.parse(raw);
+      const n =
+        typeof o.stardust === "number" && Number.isFinite(o.stardust)
+          ? Math.floor(o.stardust)
+          : DEFAULT_STARTING_STARDUST;
+        return { stardust: Math.max(0, n) };
+    } catch {
+      return { stardust: DEFAULT_STARTING_STARDUST };
+    }
+  }
+
+  /** @param {CurrencySnap} snap */
+  function saveCurrency(snap) {
+    const stardust = Math.max(0, Math.floor(snap.stardust));
+    localStorage.setItem(CURRENCY_STORAGE, JSON.stringify({ stardust }));
+    try {
+      window.dispatchEvent(
+        new CustomEvent("starfall-stardust-changed", { detail: { stardust } })
+      );
+    } catch (_) {}
+  }
+
+  /** @param {number} delta may be negative; result clamped to 0 */
+  function addStardust(delta) {
+    const cur = loadCurrency();
+    const next = Math.max(0, cur.stardust + Math.floor(delta));
+    saveCurrency({ stardust: next });
+    return next;
+  }
+
+  /** @typedef {{ id: number, name: string, role: string, rarity: 3 | 4 | 5, bossOnly?: boolean }} Character */
 
   /** @type {Character[]} */
   const ROSTER = [
@@ -23,6 +65,20 @@
     { id: 103, name: "Sugar Slime", role: "Snack tank", rarity: 3 },
     { id: 104, name: "Mochi Moth", role: "Glow scout", rarity: 3 },
     { id: 105, name: "Puff Circuit", role: "Tiny EMP", rarity: 3 },
+    {
+      id: 9001,
+      name: "Conductor of Smiles",
+      role: "Mask, host, House Policy",
+      rarity: 5,
+      bossOnly: true,
+    },
+    {
+      id: 9002,
+      name: "Memory Beast",
+      role: "Fused dreams, old regrets",
+      rarity: 5,
+      bossOnly: true,
+    },
   ];
 
   /** @returns {Character | undefined} */
@@ -167,10 +223,15 @@
     return parseUnlockSnapshot().includes(id);
   }
 
-  /** @returns {Character[]} Owned units in roster order */
+  /** @returns {Character[]} Owned units in roster order (excludes boss-only entries) */
   function getUnlockedCharacters() {
     const set = new Set(parseUnlockSnapshot());
-    return ROSTER.filter((c) => set.has(c.id));
+    return ROSTER.filter((c) => set.has(c.id) && !c.bossOnly);
+  }
+
+  /** @returns {Character[]} Pullable gacha units only */
+  function getGachaRoster() {
+    return ROSTER.filter((c) => !c.bossOnly);
   }
 
   /** @typedef {{ pullsSinceFive: number, pullsSinceFourPlus: number, totalPulls: number }} PitySnap */
@@ -202,6 +263,7 @@
     ROSTER: ROSTER,
     getCharacter: getCharacter,
     getRoster: getRoster,
+    getGachaRoster: getGachaRoster,
     drawPortrait: drawPortrait,
 
     mulberry32: mulberry32,
@@ -221,6 +283,14 @@
       PITY_STORAGE_KEY: PITY_STORAGE,
       loadPity: loadPity,
       savePity: savePity,
+      CURRENCY_STORAGE_KEY: CURRENCY_STORAGE,
+      loadCurrency: loadCurrency,
+      saveCurrency: saveCurrency,
+      addStardust: addStardust,
+      DEFAULT_STARTING_STARDUST: DEFAULT_STARTING_STARDUST,
     },
+
+    WISH_COST_SINGLE: 1,
+    WISH_COST_TEN: 10,
   };
 })();

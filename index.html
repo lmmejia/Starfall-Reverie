@@ -18,7 +18,7 @@
     <div id="story-app" class="story-app">
       <main class="game-shell">
         <header class="story-top-bar">
-          <span class="chapter-pill">Ch. 1 — The Golden District</span>
+          <span id="chapter-pill" class="chapter-pill">Ch. 1 — The Golden District</span>
           <span id="top-phase-hint" class="story-hint"></span>
         </header>
 
@@ -86,6 +86,17 @@
                 Save &amp; quit to crystals
               </button>
             </div>
+            <div class="story-boss-row">
+              <button
+                id="btn-boss-fight"
+                type="button"
+                class="story-btn story-btn-primary"
+                title="See how the fight works, then enter the arena."
+                hidden
+              >
+                Face the Conductor (battle)
+              </button>
+            </div>
           </div>
         </section>
       </main>
@@ -96,7 +107,7 @@
         class="gacha-fab"
         aria-haspopup="dialog"
         aria-controls="gacha-modal"
-        title="Open warp terminal (gacha)"
+        title="Open warp terminal (spend candies)"
       >
         <span class="gacha-fab-icon" aria-hidden="true">✦</span>
         <span class="gacha-fab-label">Warp</span>
@@ -118,9 +129,9 @@
               Starfall Reverie
             </div>
             <div class="top-stats">
-              <div class="pill" title="Imaginary pulls — demo currency">
-                <span class="label">Stardust Links</span>
-                <strong id="currency">∞</strong>
+              <div class="pill" title="Currency for wishes — 1 candy per Warp ×1, 10 for Warp ×10">
+                <span class="label">Candies</span>
+                <strong id="currency">0</strong>
               </div>
               <div class="pill" title="Pulls until 5★ pity">
                 <span class="label">To 5★</span>
@@ -168,9 +179,125 @@
           </details>
 
           <footer class="footnote">
-            Pity demo: guaranteed <strong>4★</strong> by the 10th pull without one;
+            Each wish costs <strong>1</strong> candy; Warp ×10 costs <strong>10</strong> candies. Story
+            milestones can grant more. Pity: guaranteed <strong>4★</strong> by the 10th pull without one;
             guaranteed <strong>5★</strong> on the 80th pull since your last 5★.
           </footer>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="boss-briefing-modal" class="boss-briefing-modal" aria-labelledby="boss-briefing-title">
+      <div class="boss-briefing-panel">
+        <h2 id="boss-briefing-title" class="boss-briefing-title">Before you fight</h2>
+        <p id="boss-briefing-lead" class="boss-briefing-lead">
+          Quick read — then you’ll get a safe countdown in the arena. Candies and Warp allies apply here
+          too: pick an ally in the battle UI for bonus HP and damage. You can close this anytime.
+        </p>
+        <div class="boss-howto boss-howto--briefing">
+          <ol id="boss-briefing-steps" class="boss-howto-list" aria-label="How to fight this boss"></ol>
+          <p class="boss-howto-foot">Controls: <kbd>A</kbd> <kbd>D</kbd> move · <kbd>W</kbd> center · <kbd>Space</kbd> / <kbd>S</kbd> strike.</p>
+        </div>
+        <div class="boss-briefing-actions">
+          <button type="button" class="story-btn story-btn-ghost" id="boss-briefing-cancel">Not now</button>
+          <button type="button" class="story-btn story-btn-primary" id="boss-briefing-start">Start battle</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="boss-modal" class="boss-modal" aria-labelledby="boss-modal-title">
+      <div class="boss-modal-panel">
+        <div class="boss-modal-head">
+          <div class="boss-head-text">
+            <h2 id="boss-modal-title" class="boss-modal-title">Conductor of Smiles</h2>
+            <p id="boss-phase-label" class="boss-phase-label">Phase 1 — Opening night</p>
+          </div>
+          <canvas id="boss-conductor-portrait" width="56" height="56" aria-hidden="true"></canvas>
+          <button type="button" class="boss-modal-close" id="boss-close" aria-label="Close battle">
+            ×
+          </button>
+        </div>
+        <div class="boss-body">
+          <div class="boss-hud-row">
+            <div class="boss-hp-wrap">
+              <span class="boss-hp-cap">Boss</span>
+              <div class="boss-hp-track"><div id="boss-hp-bar" class="boss-hp-fill boss-hp-boss"></div></div>
+            </div>
+            <div class="boss-hp-wrap">
+              <span class="boss-hp-cap">You</span>
+              <div class="boss-hp-track"><div id="player-hp-bar" class="boss-hp-fill boss-hp-you"></div></div>
+            </div>
+          </div>
+          <div class="boss-hype-row" title="Build hype by striking; getting hit kills hype. Crits & streaks add more.">
+            <span class="boss-hype-label">Hype</span>
+            <div class="boss-hype-track"><div id="boss-hype-fill" class="boss-hype-fill"></div></div>
+            <span id="boss-streak-label" class="boss-streak-label">Streak 0</span>
+          </div>
+          <div class="boss-gacha-row">
+            <div class="boss-stardust-pill" title="Spend candies in the Warp terminal">
+              <span class="boss-stardust-label">Candies</span>
+              <strong id="boss-stardust-display" class="boss-stardust-amt">0</strong>
+            </div>
+            <button type="button" class="story-btn story-btn-ghost" id="boss-open-warp">
+              Warp terminal
+            </button>
+            <div class="boss-ally-wrap">
+              <canvas id="boss-ally-portrait" width="40" height="40" aria-hidden="true"></canvas>
+              <label class="boss-ally-label">
+                <span class="boss-ally-label-text">Ally</span>
+                <select id="boss-ally-select" class="boss-ally-select" aria-label="Battle ally from unlocked warp roster"></select>
+              </label>
+            </div>
+          </div>
+          <p id="boss-ally-hint" class="boss-ally-hint"></p>
+          <div class="boss-arena-block">
+            <canvas id="boss-canvas" width="360" height="400" aria-label="Battle arena"></canvas>
+            <div id="boss-victory" class="boss-victory" hidden>
+              <div class="boss-victory-card">
+                <p class="boss-victory-eyebrow">Victory</p>
+                <h3 id="boss-victory-title" class="boss-victory-title">The house lights fade</h3>
+                <p id="boss-victory-blurb" class="boss-victory-blurb">
+                  The Conductor tips her hat — you made it through the encore.
+                </p>
+                <p class="boss-victory-reward">
+                  <span class="boss-victory-reward-label">Earned</span>
+                  <strong class="boss-victory-reward-amt">+<span id="boss-victory-stardust">0</span></strong>
+                  <span class="boss-victory-reward-unit">candies</span>
+                </p>
+                <div class="boss-victory-actions">
+                  <button type="button" class="story-btn story-btn-primary" id="boss-victory-continue">
+                    Continue story
+                  </button>
+                  <button type="button" class="story-btn story-btn-ghost" id="boss-victory-home">
+                    Home
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div id="boss-defeat" class="boss-defeat" hidden>
+              <div class="boss-defeat-card">
+                <p class="boss-defeat-eyebrow">Defeat</p>
+                <h3 id="boss-defeat-title" class="boss-defeat-title">Curtains</h3>
+                <p id="boss-defeat-blurb" class="boss-defeat-blurb">
+                  The Conductor curtsies anyway. The crowd pretends it was scripted.
+                </p>
+                <div class="boss-defeat-actions">
+                  <button type="button" class="story-btn story-btn-primary" id="boss-defeat-retry">Try again</button>
+                  <button type="button" class="story-btn story-btn-ghost" id="boss-defeat-home">Home</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p id="boss-fight-msg" class="boss-fight-msg" role="status"></p>
+          <div class="boss-controls">
+            <button type="button" class="story-btn story-btn-primary" id="boss-strike">
+              Strike (Space / S)
+            </button>
+          </div>
+          <p class="boss-hint">
+            <strong>Move:</strong> <kbd>A</kbd> left · <kbd>D</kbd> right · <kbd>W</kbd> center.
+            <strong>Strike:</strong> <kbd>Space</kbd> or <kbd>S</kbd> — there’s a short cooldown between hits.
+          </p>
         </div>
       </div>
     </dialog>
@@ -181,5 +308,6 @@
     <script src="game.js"></script>
     <script src="js/intro.js" defer></script>
     <script src="js/gacha-modal.js" defer></script>
+    <script src="js/conductor-boss.js" defer></script>
   </body>
 </html>
