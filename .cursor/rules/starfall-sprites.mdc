@@ -1,0 +1,23 @@
+---
+description: How to load and draw Starfall roster “sprites” (shared/starfall.js) for gacha + battle.
+alwaysApply: true
+---
+
+# Starfall Reverie — sprites & roster
+
+**Canonical doc (read fully when touching portraits, battles, or party UI):** `docs/agent-starfall-sprites.md`
+
+## Non‑negotiables
+
+- **No PNG/SVG sprite sheets** for heroes: art is **`Starfall.drawPortrait(canvas, character, { size })`** in `shared/starfall.js` (procedural Canvas).
+- **Single source of truth:** roster + drawing live in `shared/starfall.js`. **Do not** copy `drawPortrait` into other files.
+- **Load order:** any page needs `<script src="shared/starfall.js"></script>` (path relative to page) **before** scripts that use `window.Starfall`.
+- **Imports:** guard with `typeof Starfall === "undefined"` or ensure HTML load order — there is **no npm/React requirement** unless the page adds its own toolchain.
+
+## API cheat sheet
+
+- `Starfall.getCharacter(id)` — may return `undefined`; handle that.
+- `Starfall.drawPortrait(canvas, char, opts?)`
+- Party / pulls: `Starfall.Unlocks.isUnlocked(id)`, `Starfall.Unlocks.getUnlockedCharacters()`.
+
+When adding playable characters everyone shares, extend **`shared/starfall.js`** (roster entries + rarity), not duplicated battle-only assets.
