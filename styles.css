@@ -610,13 +610,7 @@ body {
   margin-bottom: 1rem;
   border: 4px solid var(--story-panel-edge);
   border-radius: 10px;
-  background:
-    repeating-linear-gradient(90deg, #ffcf6a 0 28px, #ffd88f 28px 56px),
-    linear-gradient(180deg, #87e8ff 0%, #b8f7ff 40%, #ffe8f4 100%);
-  background-blend-mode: multiply, normal;
-  box-shadow:
-    0 10px 0 var(--story-shadow),
-    inset 0 -40px 80px rgb(255 182 222 / 0.35);
+  background-color: #120818;
   position: relative;
   overflow: hidden;
 }
@@ -625,164 +619,9 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background-image:
-    radial-gradient(circle at 20% 30%, rgb(255 255 255 / 0.5) 0 8%, transparent 9%),
-    radial-gradient(circle at 78% 62%, rgb(255 255 255 / 0.45) 0 6%, transparent 7%),
-    linear-gradient(transparent 78%, rgb(196 77 106 / 0.08) 100%);
   pointer-events: none;
 }
 
-.scene-backdrop[data-scene="gate"] {
-  background: linear-gradient(180deg, #2a1838 0%, #4c3068 55%, #f0c4e8 100%);
-}
-
-.scene-backdrop[data-scene="street"] {
-  background: linear-gradient(180deg, #ffe6a8 0%, #ffd2e8 50%, #c9fff3 100%);
-}
-
-.scene-backdrop[data-scene="evening"] {
-  background: linear-gradient(185deg, #4a2c68 0%, #ff8fb5 35%, #ffd86b 70%, #2a1838 100%);
-}
-
-.scene-backdrop[data-scene="tram"] {
-  background: linear-gradient(180deg, #ffb8d9 0%, #fff0c9 45%, #7fd9ff 100%);
-  opacity: 1;
-}
-
-.scene-backdrop[data-scene="stage"] {
-  background: radial-gradient(ellipse 120% 80% at 50% 20%, #fff8e8 0%, transparent 55%),
-    linear-gradient(180deg, #1a0f28 0%, #4c3068 40%, #ffd0e8 100%);
-}
-
-.scene-backdrop[data-scene="descent"] {
-  background: linear-gradient(185deg, #0d0614 0%, #1e1238 45%, #2d2050 100%);
-}
-
-.scene-backdrop[data-scene="vault"] {
-  background: radial-gradient(ellipse 80% 50% at 50% 100%, rgb(100 200 220 / 0.12) 0%, transparent 55%),
-    linear-gradient(180deg, #161022 0%, #251a3d 60%, #0a0610 100%);
-}
-
-.scene-backdrop[data-scene="pods"] {
-  background:
-    radial-gradient(circle at 20% 30%, rgb(180 255 240 / 0.15) 0 3%, transparent 4%),
-    radial-gradient(circle at 70% 55%, rgb(200 160 255 / 0.18) 0 4%, transparent 5%),
-    linear-gradient(180deg, #120a1e 0%, #2a1a42 50%, #0d0814 100%);
-}
-
-.scene-backdrop[data-scene="tether"] {
-  background: repeating-linear-gradient(
-      90deg,
-      rgb(40 30 70 / 0.35) 0 4px,
-      transparent 4px 14px
-    ),
-    linear-gradient(175deg, #181028 0%, #3a2860 45%, #100818 100%);
-}
-
-.scene-backdrop[data-scene="deep"] {
-  background: linear-gradient(180deg, #080510 0%, #1a0f28 55%, #12082a 100%);
-}
-
-.scene-backdrop[data-scene="chorus"] {
-  background: radial-gradient(ellipse 100% 70% at 50% 50%, rgb(110 80 180 / 0.25) 0%, transparent 60%),
-    linear-gradient(180deg, #140c22 0%, #2a1850 100%);
-}
-
-.scene-backdrop[data-scene="chamber"] {
-  background: radial-gradient(ellipse 90% 60% at 50% 80%, rgb(80 255 220 / 0.08) 0%, transparent 50%),
-    linear-gradient(185deg, #0a0612 0%, #221838 40%, #0d0a18 100%);
-}
-
-.scene-backdrop[data-scene="beast"] {
-  background:
-    radial-gradient(ellipse 70% 55% at 50% 35%, rgb(200 160 255 / 0.35) 0%, transparent 55%),
-    linear-gradient(180deg, #06040c 0%, #1f1440 55%, #020308 100%);
-}
-
-.scene-backdrop[data-scene="ascent"] {
-  background: linear-gradient(195deg, #1a1030 0%, #3d2060 40%, #ffd8a8 85%, #2a1830 100%);
-}
-
-.scene-backdrop[data-scene="rotunda"] {
-  background:
-    radial-gradient(ellipse 100% 60% at 50% 0%, rgb(255 220 180 / 0.15) 0%, transparent 55%),
-    linear-gradient(180deg, #0c0818 0%, #241845 50%, #080510 100%);
-}
-
-.scene-backdrop[data-scene="planetarium"] {
-  background:
-    radial-gradient(circle at 50% 35%, rgb(120 200 255 / 0.12) 0 25%, transparent 28%),
-    linear-gradient(180deg, #05040e 0%, #1a1238 60%, #020208 100%);
-}
-
-.scene-backdrop[data-scene="orrery"] {
-  background:
-    repeating-conic-gradient(
-      from 0deg at 50% 120%,
-      rgb(40 30 80 / 0.25) 0deg,
-      transparent 8deg,
-      transparent 18deg,
-      rgb(60 40 100 / 0.2) 22deg
-    ),
-    linear-gradient(180deg, #080618 0%, #201850 100%);
-}
-
-.scene-backdrop[data-scene="veil"] {
-  background: radial-gradient(ellipse 80% 50% at 50% 50%, rgb(180 80 60 / 0.22) 0%, transparent 55%),
-    linear-gradient(185deg, #120818 0%, #3a1028 45%, #060410 100%);
-}
-
-.scene-backdrop[data-scene="eclipse"] {
-  background:
-    radial-gradient(circle at 50% 45%, transparent 0 35%, rgb(20 10 40 / 0.95) 36%),
-    radial-gradient(circle at 50% 42%, rgb(255 200 120 / 0.35) 0 15%, transparent 16%),
-    linear-gradient(180deg, #020008 0%, #1a0a28 100%);
-}
-
-.scene-backdrop[data-scene="hollow"] {
-  background: radial-gradient(ellipse 70% 45% at 50% 40%, rgb(30 40 80 / 0.4) 0%, transparent 50%),
-    linear-gradient(180deg, #000008 0%, #0a0614 100%);
-}
-
-.scene-backdrop[data-scene="aurel"] {
-  background:
-    radial-gradient(ellipse 90% 70% at 50% 30%, rgb(200 160 255 / 0.25) 0%, transparent 50%),
-    linear-gradient(180deg, #080014 0%, #301860 55%, #040010 100%);
-}
-
-.scene-backdrop[data-scene="eclipse_finale"] {
-  background:
-    radial-gradient(circle at 50% 25%, rgb(255 210 160 / 0.12) 0 20%, transparent 22%),
-    radial-gradient(ellipse 100% 80% at 50% 100%, rgb(40 20 80 / 0.5) 0%, transparent 45%),
-    linear-gradient(185deg, #020004 0%, #1a0f30 50%, #000010 100%);
-}
-
-.scene-backdrop[data-scene="aftermath"] {
-  background: linear-gradient(180deg, #1a1028 0%, #3a2848 40%, #0d0818 100%);
-}
-
-.scene-backdrop[data-scene="dawnroad"] {
-  background: linear-gradient(185deg, #ffd4a8 0%, #b898c8 35%, #1a1530 75%, #080510 100%);
-}
-
-.scene-backdrop[data-scene="starfield_path"] {
-  background:
-    radial-gradient(circle at 20% 30%, rgb(255 255 255 / 0.12) 0 2%, transparent 3%),
-    radial-gradient(circle at 75% 55%, rgb(200 220 255 / 0.15) 0 2%, transparent 2.5%),
-    linear-gradient(180deg, #06051a 0%, #101838 50%, #020208 100%);
-}
-
-.scene-backdrop[data-scene="horizon_clear"] {
-  background: linear-gradient(180deg, #87b8ff 0%, #ffe8d0 55%, #4a6090 100%);
-}
-
-.scene-backdrop[data-scene="resolution_end"] {
-  background:
-    radial-gradient(ellipse 90% 60% at 50% 20%, rgb(255 240 200 / 0.25) 0%, transparent 55%),
-    linear-gradient(185deg, #0a0614 0%, #2a2050 45%, #0d081c 100%);
-}
-
-/* Full-screen finale after all chapters */
 .screen-the-end {
   position: relative;
   width: 100%;
