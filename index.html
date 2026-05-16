@@ -18,7 +18,7 @@
     <div class="story-app">
       <main class="game-shell">
         <header class="story-top-bar">
-          <span class="chapter-pill">Ch. 1 — The Golden District</span>
+          <span id="chapter-pill" class="chapter-pill">Ch. 1 — The Golden District</span>
           <span class="story-hint">Space — next · ← / Backspace — back</span>
         </header>
 
@@ -154,37 +154,12 @@
     <dialog id="boss-briefing-modal" class="boss-briefing-modal" aria-labelledby="boss-briefing-title">
       <div class="boss-briefing-panel">
         <h2 id="boss-briefing-title" class="boss-briefing-title">Before you fight</h2>
-        <p class="boss-briefing-lead">
+        <p id="boss-briefing-lead" class="boss-briefing-lead">
           Quick read — then you’ll get a safe countdown in the arena. Candies and Warp allies apply here
           too: pick an ally in the battle UI for bonus HP and damage. You can close this anytime.
         </p>
         <div class="boss-howto boss-howto--briefing">
-          <ol class="boss-howto-list">
-            <li>
-              <strong>You</strong> are the <strong>cyan circle</strong> at the bottom. There are
-              <strong>three lanes</strong>: left, center, right — use <kbd>A</kbd> / <kbd>D</kbd> (or
-              <kbd>W</kbd> for center).
-            </li>
-            <li>
-              <strong>Pink glowing zone</strong> at the top of a lane → a <strong>smile note</strong> will fall straight
-              down that lane. Move away before it lands on you.
-            </li>
-            <li>
-              <strong>Tram</strong>: two lanes get a <strong>red “track” zone up top</strong> (gold dashes = rails).
-              The <strong>lane that stays cyan / quiet</strong> is safe. After the warning, a <strong>tram box</strong>
-              slams down the red tracks — don’t stand there.
-            </li>
-            <li>
-              <strong>Strike</strong> builds <strong>Hype</strong> for bigger hits; <strong>streaks</strong> and random
-              <strong>crits</strong> help a lot. Getting hit shreds Hype.
-            </li>
-            <li>
-              Watch for <strong>note flurries</strong> and <strong>twin notes</strong> in the same lane — stay mobile.
-            </li>
-            <li>
-              <strong>Phase 2</strong> after she’s below half HP — faster patterns (Encore!).
-            </li>
-          </ol>
+          <ol id="boss-briefing-steps" class="boss-howto-list" aria-label="How to fight this boss"></ol>
           <p class="boss-howto-foot">Controls: <kbd>A</kbd> <kbd>D</kbd> move · <kbd>W</kbd> center · <kbd>Space</kbd> / <kbd>S</kbd> strike.</p>
         </div>
         <div class="boss-briefing-actions">
@@ -244,8 +219,8 @@
             <div id="boss-victory" class="boss-victory" hidden>
               <div class="boss-victory-card">
                 <p class="boss-victory-eyebrow">Victory</p>
-                <h3 class="boss-victory-title">The house lights fade</h3>
-                <p class="boss-victory-blurb">
+                <h3 id="boss-victory-title" class="boss-victory-title">The house lights fade</h3>
+                <p id="boss-victory-blurb" class="boss-victory-blurb">
                   The Conductor tips her hat — you made it through the encore.
                 </p>
                 <p class="boss-victory-reward">
@@ -266,8 +241,8 @@
             <div id="boss-defeat" class="boss-defeat" hidden>
               <div class="boss-defeat-card">
                 <p class="boss-defeat-eyebrow">Defeat</p>
-                <h3 class="boss-defeat-title">Curtains</h3>
-                <p class="boss-defeat-blurb">
+                <h3 id="boss-defeat-title" class="boss-defeat-title">Curtains</h3>
+                <p id="boss-defeat-blurb" class="boss-defeat-blurb">
                   The Conductor curtsies anyway. The crowd pretends it was scripted.
                 </p>
                 <div class="boss-defeat-actions">

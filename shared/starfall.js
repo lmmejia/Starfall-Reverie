@@ -72,6 +72,13 @@
       rarity: 5,
       bossOnly: true,
     },
+    {
+      id: 9002,
+      name: "Memory Beast",
+      role: "Fused dreams, old regrets",
+      rarity: 5,
+      bossOnly: true,
+    },
   ];
 
   /** @returns {Character | undefined} */

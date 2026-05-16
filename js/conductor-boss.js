@@ -1,9 +1,8 @@
 /* global Starfall */
 /**
- * Conductor of Smiles — two phases, tram rush, note flurries, hype/streak, juice.
+ * Boss lanes — Conductor of Smiles (Ch.1) & Memory Beast (Ch.2). Theme driven via window.__starfallBattle.
  */
 (() => {
-  const BOSS_ID = 9001;
   const W = 360;
   const H = 400;
   const LANES = 3;
@@ -18,7 +17,6 @@
   const NOTE_DMG = 16;
   const TRAIN_DMG = 26;
   const I_FRAMES = 0.52;
-  const VICTORY_STARDUST = 35;
   const CRIT_CHANCE = 0.2;
   const CRIT_MULT = 2.35;
   const HYPE_ON_HIT = 12;
@@ -27,13 +25,170 @@
   const HYPE_CAP = 100;
   const BATTLE_ALLY_KEY = "starfall-reverie-battle-ally-v1";
 
-  const TAUNTS = [
-    "Smile wider, darling — the cheap seats are watching.",
-    "You blink off-beat. How… authentic.",
-    "House policy: joy is mandatory!",
-    "The tram loves a straggler.",
-    "Hold that grin until intermission!",
-  ];
+  function getBattleKey() {
+    return window.__starfallBattle === "memory" ? "memory" : "conductor";
+  }
+
+  /** @param {"conductor"|"memory"} key */
+  function battleTheme(key) {
+    return THEME[key] || THEME.conductor;
+  }
+
+  const THEME = {
+    conductor: {
+      bossId: 9001,
+      victoryStardust: 35,
+      modalTitle: "Conductor of Smiles",
+      phase1Label: "Phase 1 — Opening night",
+      phase2Label: "Phase 2 — Encore!",
+      prepSub: "Hype & streaks power up your strikes after GO",
+      playHint:
+        "Build hype with strikes. Pink zone = note coming down. Tram: stand in the cyan SAFE lane when you see TRACKS up top.",
+      encoreHudMsg: "ENCORE! Faster patterns — don’t let the hype drop!",
+      encoreCaption: "Faster! Louder! Kinder!",
+      victoryHud: "You cleared the stage — reward unlocked.",
+      victoryTitle: "The house lights fade",
+      victoryBlurb:
+        "The Conductor tips her hat — you made it through the encore.",
+      defeatHud: "Curtains. Want another ticket?",
+      defeatTitle: "Curtains",
+      defeatBlurb:
+        "The Conductor curtsies anyway. The crowd pretends it was scripted.",
+      warmupHud: "Warm-up — safe until countdown ends",
+      briefingTitle: "Before you fight",
+      briefingLead:
+        "Quick read — then you’ll get a safe countdown in the arena. Candies and Warp allies apply here too: pick an ally in the battle UI for bonus HP and damage. You can close this anytime.",
+      briefingItems: [
+        `<strong>You</strong> are the <strong>cyan circle</strong> at the bottom. There are <strong>three lanes</strong>: left, center, right — use <kbd>A</kbd> / <kbd>D</kbd> (or <kbd>W</kbd> for center).`,
+        `<strong>Pink glowing zone</strong> at the top of a lane → a <strong>smile note</strong> will fall straight down that lane. Move away before it lands on you.`,
+        `<strong>Tram</strong>: two lanes get a <strong>red “track” zone up top</strong> (gold dashes = rails). The <strong>lane that stays cyan / quiet</strong> is safe. After the warning, a <strong>tram box</strong> slams down the red tracks — don’t stand there.`,
+        `<strong>Strike</strong> builds <strong>Hype</strong> for bigger hits; <strong>streaks</strong> and random <strong>crits</strong> help a lot. Getting hit shreds Hype.`,
+        `Watch for <strong>note flurries</strong> and <strong>twin notes</strong> in the same lane — stay mobile.`,
+        `<strong>Phase 2</strong> after she’s below half HP — faster patterns (Encore!).`,
+      ],
+      taunts: [
+        "Smile wider, darling — the cheap seats are watching.",
+        "You blink off-beat. How… authentic.",
+        "House policy: joy is mandatory!",
+        "The tram loves a straggler.",
+        "Hold that grin until intermission!",
+      ],
+      captionTrain: "Red = tram tracks soon. Stand in the calm lane!",
+      captionDouble: "Double smile-note — same lane twice!",
+      captionFlurry: "Flurry — hop lanes!",
+      streakCaption: "Crowd’s going wild — keep the streak!",
+      hurtCaption: "Ouch — hype took a hit!",
+      losePendingHud: "Hold on — let the stage clear…",
+      trainTopLabel: "TRACKS",
+      safeLabel: "SAFE",
+      noteTeleRgb: "255 156 207",
+      noteOrb: "#ff9ccf",
+      noteHighlight: "#fff6fa",
+      trainWarnRgb: "255 60 95",
+      trainDashRgb: "255 210 120",
+      trainChargeBody: "#ff4d7a",
+      trainChargeWindow: "#fff5d6",
+      trainChargeRoof: "#1a0f22",
+      trainChargeLight: "#ffe08a",
+      safeFillRgb: "126 232 255",
+      safeStrokeRgb: "126 232 255",
+      safeTextRgb: "201 255 255",
+      encoreFlash0: "#fff8f0",
+      encoreFlash1: "rgb(255 200 230 / 0.15)",
+      starWarm: "rgb(255 230 180 / 0.18)",
+      starCool: "rgb(126 232 255 / 0.15)",
+      laneStroke: "rgb(255 200 230 / 0.12)",
+      bg0: "#2a1838",
+      bg1: "#4c2558",
+      bg2: "#1a0f22",
+      captionBoxStroke: "rgb(255 224 140 / 0.5)",
+      captionText: "#ffe8c4",
+      prepBorderRgb: "126 232 255",
+      prepTitle: "#c9fff3",
+      prepSubRgb: "201 184 217",
+      strikeParticleCrit: ["#ffe08a", "#fff6c9", "#ff9ccf"],
+      strikeParticleNorm: ["#7ee8ff", "#ff9ccf", "#fff"],
+      hurtParticle: ["#ff6b9d", "#ff9ccf", "#fff"],
+      victoryParticles: ["#ffe08a", "#7ee8ff", "#ff9ccf"],
+    },
+    memory: {
+      bossId: 9002,
+      victoryStardust: 40,
+      modalTitle: "Memory Beast",
+      phase1Label: "Phase 1 — Shallow sleep",
+      phase2Label: "Phase 2 — Deep rot",
+      prepSub: "Resolve sharpens strikes — don’t let regret drain your hype",
+      playHint:
+        "Build hype with strikes. Lavender zone = memory shard falling. Regret surge: stand in the teal CLEAR lane when you see SURGE at the top.",
+      encoreHudMsg: "It wakes deeper — patterns tighten. Keep your mind in one lane!",
+      encoreCaption: "All your unfinished sentences—at once!",
+      victoryHud: "You tear a hole through the nightmare — candies spill through.",
+      victoryTitle: "The pods dim",
+      victoryBlurb:
+        "The Beast unspools into frayed mist. For a heartbeat, the chamber is only breathing glass.",
+      defeatHud: "Sleep claims another echo. Try again when you’re ready.",
+      defeatTitle: "Folded under",
+      defeatBlurb:
+        "The whispers sound like your voice now—not because they’re true, but because the deep is a talented mimic.",
+      warmupHud: "Stasis field — you can’t be hurt until the mind counts down",
+      briefingTitle: "Before you descend",
+      briefingLead:
+        "Same arena, deadlier mood: you still get a safe prep countdown. Warp allies still grant bonus HP and damage. Read fast—the Beast doesn’t wait politely.",
+      briefingItems: [
+        `<strong>You</strong> remain the <strong>cyan circle</strong>; lanes are still <kbd>A</kbd> / <kbd>D</kbd> / <kbd>W</kbd> center.`,
+        `<strong>Lavender glow</strong> telegraphs a <strong>memory shard</strong> plunging one lane. Move out before it strikes.`,
+        `<strong>Regret surge</strong>: two lanes flood with <strong>violet warning bands</strong>. The <strong>lane that stays teal / quiet</strong> is <strong>CLEAR</strong>. After the pulse, a <strong>surge mass</strong> rams the violet lanes—don’t stand there.`,
+        `<strong>Hype & streaks</strong> still amplify strikes; <strong>crits</strong> help pierce dreaming armor. Getting hit drains resolve fast.`,
+        `Watch for <strong>shard flurries</strong> and <strong>twin shards</strong> in the same lane.`,
+        `<strong>Phase 2</strong> below half HP — faster spawns and shorter telegraphs.`,
+      ],
+      taunts: [
+        "That’s not déjà vu—that’s me borrowing your old guilt.",
+        "Stay still; I’ll file your courage under ‘lost’.",
+        "Every lane you hesitate in becomes mine.",
+        "You taste like an apology half-written.",
+        "The pods hum prettier when you’re afraid.",
+      ],
+      captionTrain:
+        "Violet lanes = regret surge soon. Find the mind-path that stays CLEAR.",
+      captionDouble: "Twin shards—same lane, twice.",
+      captionFlurry: "Shards scatter—keep moving.",
+      streakCaption: "Your focus holds — drive the shard home!",
+      hurtCaption: "Regret clipped you — hype frays.",
+      losePendingHud: "Wait—let the surge pass through you…",
+      trainTopLabel: "SURGE",
+      safeLabel: "CLEAR",
+      noteTeleRgb: "186 140 255",
+      noteOrb: "#c9b3ff",
+      noteHighlight: "#eafcff",
+      trainWarnRgb: "110 70 180",
+      trainDashRgb: "120 220 200",
+      trainChargeBody: "#5a3d8a",
+      trainChargeWindow: "#7fd9c8",
+      trainChargeRoof: "#24183a",
+      trainChargeLight: "#b8a0ff",
+      safeFillRgb: "80 200 190",
+      safeStrokeRgb: "120 255 236",
+      safeTextRgb: "200 255 248",
+      encoreFlash0: "#d8c4ff",
+      encoreFlash1: "rgb(80 40 120 / 0.2)",
+      starWarm: "rgb(200 180 255 / 0.16)",
+      starCool: "rgb(120 255 220 / 0.12)",
+      laneStroke: "rgb(160 140 220 / 0.15)",
+      bg0: "#120a1c",
+      bg1: "#2a1842",
+      bg2: "#080510",
+      captionBoxStroke: "rgb(160 200 255 / 0.45)",
+      captionText: "#dde8ff",
+      prepBorderRgb: "120 200 255",
+      prepTitle: "#bfefff",
+      prepSubRgb: "170 160 220",
+      strikeParticleCrit: ["#ffe08a", "#c9b3ff", "#7fd9c8"],
+      strikeParticleNorm: ["#7ee8ff", "#c9b3ff", "#fff"],
+      hurtParticle: ["#9b6dff", "#c9b3ff", "#fff"],
+      victoryParticles: ["#c9b3ff", "#7fd9c8", "#ffe08a"],
+    },
+  };
 
   /** @type {HTMLDialogElement | null} */
   const dialog = document.querySelector("#boss-modal");
@@ -65,6 +220,14 @@
   const allySelect = document.querySelector("#boss-ally-select");
   const allyPortraitEl = document.querySelector("#boss-ally-portrait");
   const allyHintEl = document.querySelector("#boss-ally-hint");
+  const briefingTitleEl = document.querySelector("#boss-briefing-title");
+  const briefingLeadEl = document.querySelector("#boss-briefing-lead");
+  const briefingStepsEl = document.querySelector("#boss-briefing-steps");
+  const bossModalTitleEl = document.querySelector("#boss-modal-title");
+  const victoryTitleEl = document.querySelector("#boss-victory-title");
+  const victoryBlurbEl = document.querySelector("#boss-victory-blurb");
+  const defeatTitleEl = document.querySelector("#boss-defeat-title");
+  const defeatBlurbEl = document.querySelector("#boss-defeat-blurb");
 
   if (!dialog || !canvas || !btnStoryBoss) return;
 
@@ -122,6 +285,16 @@
     beep(120, 0.25, "square", 0.035);
   }
 
+  /** @param {"conductor"|"memory"} bk */
+  function sfxTrainForBattle(bk) {
+    if (bk === "memory") {
+      beep(95, 0.28, "sawtooth", 0.055);
+      beep(60, 0.32, "sawtooth", 0.04);
+    } else {
+      sfxTrain();
+    }
+  }
+
   function sfxGo() {
     beep(660, 0.1, "square", 0.07);
     beep(880, 0.14, "square", 0.05);
@@ -156,6 +329,15 @@
     return o;
   }
 
+  function fillBriefing() {
+    const t = battleTheme(getBattleKey());
+    if (briefingTitleEl) briefingTitleEl.textContent = t.briefingTitle;
+    if (briefingLeadEl) briefingLeadEl.textContent = t.briefingLead;
+    if (briefingStepsEl) {
+      briefingStepsEl.innerHTML = t.briefingItems.map((html) => "<li>" + html + "</li>").join("");
+    }
+  }
+
   function hideVictory() {
     if (!victoryOverlay) return;
     victoryOverlay.hidden = true;
@@ -166,7 +348,10 @@
     if (!victoryOverlay) return;
     victoryOverlay.removeAttribute("hidden");
     victoryOverlay.hidden = false;
-    if (victoryStardustEl) victoryStardustEl.textContent = String(VICTORY_STARDUST);
+    const t = battleTheme(state.battleKey);
+    if (victoryStardustEl) victoryStardustEl.textContent = String(t.victoryStardust);
+    if (victoryTitleEl) victoryTitleEl.textContent = t.victoryTitle;
+    if (victoryBlurbEl) victoryBlurbEl.textContent = t.victoryBlurb;
     btnVictoryContinue?.focus();
   }
 
@@ -180,6 +365,9 @@
     if (!defeatOverlay) return;
     defeatOverlay.removeAttribute("hidden");
     defeatOverlay.hidden = false;
+    const t = battleTheme(state.battleKey);
+    if (defeatTitleEl) defeatTitleEl.textContent = t.defeatTitle;
+    if (defeatBlurbEl) defeatBlurbEl.textContent = t.defeatBlurb;
     btnDefeatRetry?.focus();
   }
 
@@ -290,7 +478,12 @@
     const bon = allyBonuses(ally);
     if (allySelect) allySelect.disabled = false;
 
+    const bk = getBattleKey();
+    const th = battleTheme(bk);
+    if (bossModalTitleEl) bossModalTitleEl.textContent = th.modalTitle;
+
     state = {
+      battleKey: bk,
       playerLane: 1,
       bossHp: BOSS_HP_MAX,
       playerHp: PLAYER_HP_MAX + bon.hpBonus,
@@ -326,19 +519,19 @@
     if (hudStreak) hudStreak.textContent = "Streak 0";
     drawBossPortrait();
     updateHud();
-    if (hudPhase) hudPhase.textContent = "Warm-up — safe until countdown ends";
+    if (hudPhase) hudPhase.textContent = th.warmupHud;
   }
 
   function drawBossPortrait() {
     if (!portraitEl || typeof Starfall === "undefined") return;
-    const c = Starfall.getCharacter(BOSS_ID);
+    const c = Starfall.getCharacter(battleTheme(state.battleKey).bossId);
     if (c) Starfall.drawPortrait(portraitEl, c, { size: 56 });
   }
 
   function updateHud() {
+    const th = battleTheme(state.battleKey);
     if (hudPhase && state.status !== "prep")
-      hudPhase.textContent =
-        state.phase >= 2 ? "Phase 2 — Encore!" : "Phase 1 — Opening night";
+      hudPhase.textContent = state.phase >= 2 ? th.phase2Label : th.phase1Label;
     const bp = Math.max(0, (state.bossHp / BOSS_HP_MAX) * 100);
     const pp = Math.max(0, (state.playerHp / state.playerHpMax) * 100);
     if (hudBossHp) hudBossHp.style.width = bp + "%";
@@ -356,13 +549,15 @@
     if (state.status !== "play") return;
     if (nowS < state.nextTauntAt) return;
     state.nextTauntAt = nowS + 5.5 + Math.random() * 4;
-    setCaption(TAUNTS[Math.floor(Math.random() * TAUNTS.length)], 2.4);
+    const taunts = battleTheme(state.battleKey).taunts;
+    setCaption(taunts[Math.floor(Math.random() * taunts.length)], 2.4);
   }
 
   function setPhase() {
     if (state.bossHp <= 0) return;
     const half = BOSS_HP_MAX * 0.5;
     if (state.bossHp <= half && state.phase === 1 && !state.phaseEnteredTwo) {
+      const th = battleTheme(state.battleKey);
       state.phaseEnteredTwo = true;
       state.phase = 2;
       state.nextSpawn = performance.now() / 1000 + 0.25;
@@ -370,8 +565,8 @@
       state.encoreFlashUntil = nowS + 0.55;
       state.hitShakeUntil = performance.now() + 420;
       sfxEncore();
-      if (hudMsg) hudMsg.textContent = "ENCORE! Faster patterns — don’t let the hype drop!";
-      setCaption("Faster! Louder! Kinder!", 2.8);
+      if (hudMsg) hudMsg.textContent = th.encoreHudMsg;
+      setCaption(th.encoreCaption, 2.8);
     }
   }
 
@@ -396,7 +591,9 @@
   }
 
   function strikeFx(crit, dmg, px) {
-    addParticles(px, PLAYER_Y - 10, crit ? 16 : 10, 120, crit ? ["#ffe08a", "#fff6c9", "#ff9ccf"] : ["#7ee8ff", "#ff9ccf", "#fff"]);
+    const th = battleTheme(state.battleKey);
+    const pal = crit ? th.strikeParticleCrit : th.strikeParticleNorm;
+    addParticles(px, PLAYER_Y - 10, crit ? 16 : 10, 120, pal);
     addPop(W / 2 + (Math.random() - 0.5) * 40, 86, crit ? "CRIT " + dmg : "−" + dmg, crit ? "#ffe08a" : "#c9fff3");
   }
 
@@ -414,6 +611,7 @@
 
   function spawnAttack(nowS) {
     const p2 = state.phase >= 2;
+    const th = battleTheme(state.battleKey);
     const r = Math.random();
 
     if (r < (p2 ? 0.28 : 0.24)) {
@@ -432,8 +630,8 @@
         hitApplied: false,
         honked: false,
       });
-      sfxTrain();
-      setCaption("Red = tram tracks soon. Stand in the calm lane!", 1.45);
+      sfxTrainForBattle(state.battleKey);
+      setCaption(th.captionTrain, 1.45);
       return;
     }
 
@@ -441,7 +639,7 @@
       const lane = Math.floor(Math.random() * LANES);
       state.attacks.push(noteAttack(lane, nowS, p2));
       state.attacks.push(noteAttack(lane, nowS + (p2 ? 0.26 : 0.36), p2));
-      setCaption("Double smile-note — same lane twice!", 1.1);
+      setCaption(th.captionDouble, 1.1);
       return;
     }
 
@@ -452,7 +650,7 @@
       for (let i = 0; i < count; i++) {
         state.attacks.push(noteAttack(lanes[i % 3], nowS + i * gap, p2));
       }
-      setCaption("Flurry — hop lanes!", 1);
+      setCaption(th.captionFlurry, 1);
       return;
     }
 
@@ -469,9 +667,10 @@
     state.hype = Math.max(0, state.hype - HYPE_LOSS_ON_DAMAGE);
     state.streak = 0;
     state.hitShakeUntil = performance.now() + 320;
+    const th = battleTheme(state.battleKey);
     sfxHurt();
-    addParticles(laneCenterX(state.playerLane), PLAYER_Y, 14, 90, ["#ff6b9d", "#ff9ccf", "#fff"]);
-    setCaption("Ouch — hype took a hit!", 1.5);
+    addParticles(laneCenterX(state.playerLane), PLAYER_Y, 14, 90, th.hurtParticle);
+    setCaption(th.hurtCaption, 1.5);
     updateHud();
     if (state.playerHp <= 0) beginLoseSequence();
   }
@@ -483,7 +682,7 @@
     state.status = "lose_pending";
     state.playerHp = 0;
     if (btnStrike) btnStrike.disabled = true;
-    if (hudMsg) hudMsg.textContent = "Hold on — let the stage clear…";
+    if (hudMsg) hudMsg.textContent = battleTheme(state.battleKey).losePendingHud;
     updateHud();
   }
 
@@ -494,7 +693,8 @@
     if (state.raf) cancelAnimationFrame(state.raf);
     state.raf = 0;
     state.status = "lose";
-    if (hudMsg) hudMsg.textContent = "Curtains. Want another ticket?";
+    const th = battleTheme(state.battleKey);
+    if (hudMsg) hudMsg.textContent = th.defeatHud;
     showDefeat();
     updateHud();
   }
@@ -506,12 +706,21 @@
     state.raf = 0;
     sfxWin();
     showVictory();
-    if (hudMsg) hudMsg.textContent = "You cleared the stage — reward unlocked.";
+    const th = battleTheme(state.battleKey);
+    if (hudMsg) hudMsg.textContent = th.victoryHud;
     try {
-      if (typeof Starfall !== "undefined") Starfall.Persistence.addStardust(VICTORY_STARDUST);
+      if (typeof Starfall !== "undefined") Starfall.Persistence.addStardust(th.victoryStardust);
     } catch (_) {}
-    addParticles(W / 2, H / 2, 40, 200, ["#ffe08a", "#7ee8ff", "#ff9ccf"]);
+    addParticles(W / 2, H / 2, 40, 200, th.victoryParticles);
     updateHud();
+    try {
+      window.dispatchEvent(
+        new CustomEvent("starfall-chapter-boss-beaten", {
+          bubbles: true,
+          detail: { chapter: state.battleKey === "memory" ? 2 : 1 },
+        }),
+      );
+    } catch (_) {}
   }
 
   function strike() {
@@ -532,7 +741,7 @@
     sfxStrike(crit);
     strikeFx(crit, dmg, laneCenterX(state.playerLane));
     if (state.streak >= 5 && state.streak % 5 === 0) {
-      setCaption("Crowd’s going wild — keep the streak!", 1.6);
+      setCaption(battleTheme(state.battleKey).streakCaption, 1.6);
     }
     updateHud();
     if (state.bossHp <= 0) {
@@ -620,14 +829,15 @@
   }
 
   function renderStars() {
+    const th = battleTheme(state.battleKey);
     const s = state.starScroll;
-    ctx.fillStyle = "rgb(255 230 180 / 0.18)";
+    ctx.fillStyle = th.starWarm;
     for (let i = 0; i < 18; i++) {
       const x = ((i * 67 + s * 0.7) % W) | 0;
       const y = ((i * 41 + s * 1.3) % H) | 0;
       ctx.fillRect(x, y, 2, 2);
     }
-    ctx.fillStyle = "rgb(126 232 255 / 0.15)";
+    ctx.fillStyle = th.starCool;
     for (let i = 0; i < 14; i++) {
       const x = ((i * 53 - s) % W) | 0;
       const y = ((i * 71 + s * 0.9) % H) | 0;
@@ -636,6 +846,7 @@
   }
 
   function render(nowS) {
+    const th = battleTheme(state.battleKey);
     ctx.imageSmoothingEnabled = false;
     const sh = shakePx();
     ctx.save();
@@ -643,8 +854,8 @@
 
     if (state.encoreFlashUntil > nowS) {
       const g = ctx.createLinearGradient(0, 0, 0, H);
-      g.addColorStop(0, "#fff8f0");
-      g.addColorStop(1, "rgb(255 200 230 / 0.15)");
+      g.addColorStop(0, th.encoreFlash0);
+      g.addColorStop(1, th.encoreFlash1);
       ctx.fillStyle = g;
       ctx.globalAlpha = 0.35 * (state.encoreFlashUntil - nowS) + 0.2;
       ctx.fillRect(0, 0, W, H);
@@ -652,15 +863,15 @@
     }
 
     const g2 = ctx.createLinearGradient(0, 0, 0, H);
-    g2.addColorStop(0, "#2a1838");
-    g2.addColorStop(0.45, "#4c2558");
-    g2.addColorStop(1, "#1a0f22");
+    g2.addColorStop(0, th.bg0);
+    g2.addColorStop(0.45, th.bg1);
+    g2.addColorStop(1, th.bg2);
     ctx.fillStyle = g2;
     ctx.fillRect(0, 0, W, H);
 
     renderStars();
 
-    ctx.strokeStyle = "rgb(255 200 230 / 0.12)";
+    ctx.strokeStyle = th.laneStroke;
     ctx.lineWidth = 2;
     for (let i = 1; i < LANES; i++) {
       ctx.beginPath();
@@ -672,9 +883,9 @@
     if (performance.now() / 1000 < state.captionUntil && state.caption) {
       ctx.fillStyle = "rgb(0 0 0 / 0.45)";
       ctx.fillRect(8, 52, W - 16, 36);
-      ctx.strokeStyle = "rgb(255 224 140 / 0.5)";
+      ctx.strokeStyle = th.captionBoxStroke;
       ctx.strokeRect(8, 52, W - 16, 36);
-      ctx.fillStyle = "#ffe8c4";
+      ctx.fillStyle = th.captionText;
       ctx.font = '7px "Press Start 2P", monospace';
       ctx.textAlign = "center";
       const lines = state.caption.match(/.{1,42}/g) || [state.caption];
@@ -689,17 +900,25 @@
         const teleEnd = a.t0 + a.telegraph;
         if (nowS < teleEnd) {
           const pulse = 0.5 + 0.5 * Math.sin(nowS * 14);
-          ctx.fillStyle = "rgb(255 156 207 / " + (0.22 + pulse * 0.38) + ")";
+          ctx.fillStyle = "rgb(" + th.noteTeleRgb + " / " + (0.22 + pulse * 0.38) + ")";
           ctx.fillRect(a.lane * LANE_W + 4, 48, LANE_W - 8, 52);
         } else {
-          ctx.shadowColor = "#ff9ccf";
+          ctx.shadowColor = th.noteOrb;
           ctx.shadowBlur = 10;
-          ctx.fillStyle = "#ff9ccf";
-          ctx.beginPath();
-          ctx.arc(cx, a.y, 15, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.fillStyle = th.noteOrb;
+          if (state.battleKey === "memory") {
+            ctx.save();
+            ctx.translate(cx, a.y);
+            ctx.rotate(Math.PI / 4);
+            ctx.fillRect(-12, -12, 24, 24);
+            ctx.restore();
+          } else {
+            ctx.beginPath();
+            ctx.arc(cx, a.y, 15, 0, Math.PI * 2);
+            ctx.fill();
+          }
           ctx.shadowBlur = 0;
-          ctx.fillStyle = "#fff6fa";
+          ctx.fillStyle = th.noteHighlight;
           ctx.fillRect(cx - 3, a.y - 5, 6, 5);
         }
       } else if (a.kind === "train") {
@@ -707,30 +926,30 @@
         if (nowS < chargeStart) {
           const safeLane = [0, 1, 2].find((ln) => !a.lanes.includes(ln));
           if (safeLane !== undefined) {
-            ctx.fillStyle = "rgb(126 232 255 / 0.14)";
+            ctx.fillStyle = "rgb(" + th.safeFillRgb + " / 0.14)";
             ctx.fillRect(safeLane * LANE_W + 3, 0, LANE_W - 6, H);
-            ctx.strokeStyle = "rgb(126 232 255 / 0.5)";
+            ctx.strokeStyle = "rgb(" + th.safeStrokeRgb + " / 0.5)";
             ctx.lineWidth = 2;
             ctx.strokeRect(safeLane * LANE_W + 4, 4, LANE_W - 8, H - 8);
-            ctx.fillStyle = "rgb(201 255 255 / 0.95)";
+            ctx.fillStyle = "rgb(" + th.safeTextRgb + " / 0.95)";
             ctx.font = '6px "Press Start 2P", monospace';
             ctx.textAlign = "center";
-            ctx.fillText("SAFE", laneCenterX(safeLane), H - 14);
+            ctx.fillText(th.safeLabel, laneCenterX(safeLane), H - 14);
           }
           const warnBottom = H * 0.4;
           for (const L of a.lanes) {
             const pulse = Math.sin(nowS * 14) * 0.12 + 0.88;
-            ctx.fillStyle = "rgb(255 60 95 / " + (0.2 * pulse) + ")";
+            ctx.fillStyle = "rgb(" + th.trainWarnRgb + " / " + (0.2 * pulse) + ")";
             ctx.fillRect(L * LANE_W + 2, 0, LANE_W - 4, warnBottom);
-            ctx.fillStyle = "rgb(255 210 120 / 0.4)";
+            ctx.fillStyle = "rgb(" + th.trainDashRgb + " / 0.4)";
             for (let y = 0; y < warnBottom - 6; y += 16) {
               ctx.fillRect(L * LANE_W + 2, y, LANE_W - 4, 7);
             }
           }
-          ctx.fillStyle = "rgb(255 235 210 / 0.9)";
+          ctx.fillStyle = th.captionText;
           ctx.font = '6px "Press Start 2P", monospace';
           ctx.textAlign = "center";
-          ctx.fillText("TRACKS", W / 2, 12);
+          ctx.fillText(th.trainTopLabel, W / 2, 12);
         } else {
           const tw = a.lanes.length * LANE_W;
           const tx = Math.min(...a.lanes) * LANE_W;
@@ -740,22 +959,22 @@
           ctx.clip();
 
           const bodyH = 118;
-          ctx.fillStyle = "#ff4d7a";
+          ctx.fillStyle = th.trainChargeBody;
           ctx.fillRect(tx + 2, a.y, tw - 4, bodyH);
-          ctx.fillStyle = "#fff5d6";
+          ctx.fillStyle = th.trainChargeWindow;
           for (let i = 0; i < 9; i++) {
             ctx.fillRect(tx + 3 + i * 11, a.y + 14, 7, bodyH - 28);
           }
-          ctx.fillStyle = "#1a0f22";
+          ctx.fillStyle = th.trainChargeRoof;
           ctx.fillRect(tx + 6, a.y + 28, tw - 14, 24);
-          ctx.fillStyle = "#ffe08a";
+          ctx.fillStyle = th.trainChargeLight;
           ctx.beginPath();
           ctx.arc(tx + tw / 2, a.y + 18, 8, 0, Math.PI * 2);
           ctx.fill();
           ctx.fillStyle = "rgb(255 255 255 / 0.9)";
           ctx.fillRect(tx + tw / 2 - 3, a.y + 14, 6, 5);
           for (let j = 0; j < 3; j++) {
-            ctx.fillStyle = j % 2 ? "#2a1838" : "#ffe08a";
+            ctx.fillStyle = j % 2 ? th.trainChargeRoof : th.trainChargeLight;
             ctx.fillRect(tx + 12 + j * 22, a.y + 92, 14, 8);
           }
           ctx.restore();
@@ -802,15 +1021,15 @@
     if (state.status === "prep") {
       ctx.fillStyle = "rgb(0 0 0 / 0.55)";
       ctx.fillRect(12, 12, W - 24, 40);
-      ctx.strokeStyle = "rgb(126 232 255 / 0.6)";
+      ctx.strokeStyle = "rgb(" + th.prepBorderRgb + " / 0.6)";
       ctx.lineWidth = 2;
       ctx.strokeRect(12, 12, W - 24, 40);
-      ctx.fillStyle = "#c9fff3";
+      ctx.fillStyle = th.prepTitle;
       ctx.font = '8px "Press Start 2P", monospace';
       ctx.fillText("NO ENEMIES YET — move with A / D / W", W / 2, 30);
-      ctx.fillStyle = "rgb(201 184 217 / 0.95)";
+      ctx.fillStyle = "rgb(" + th.prepSubRgb + " / 0.95)";
       ctx.font = '7px "Press Start 2P", monospace';
-      ctx.fillText("Hype & streaks power up your strikes after GO", W / 2, 44);
+      ctx.fillText(th.prepSub, W / 2, 44);
     }
 
     ctx.restore();
@@ -834,12 +1053,10 @@
         state.nextTauntAt = nowS + 4;
         if (btnStrike) btnStrike.disabled = false;
         if (allySelect) allySelect.disabled = true;
-        if (hudMsg)
-          hudMsg.textContent =
-            "Build hype with strikes. Pink zone = note coming down. Tram: stand in the cyan SAFE lane when you see TRACKS up top.";
+        const th = battleTheme(state.battleKey);
+        if (hudMsg) hudMsg.textContent = th.playHint;
         if (hudPhase)
-          hudPhase.textContent =
-            state.phase >= 2 ? "Phase 2 — Encore!" : "Phase 1 — Opening night";
+          hudPhase.textContent = state.phase >= 2 ? th.phase2Label : th.phase1Label;
         sfxGo();
       } else {
         const leftSec = (state.prepEndAt - t) / 1000;
@@ -849,10 +1066,12 @@
           if (n >= 1) beep(540 - (3 - n) * 100, 0.09, "square", 0.055);
         }
         if (hudMsg) {
-          hudMsg.textContent =
-            n >= 1
-              ? "Countdown: " + n + " — warm up those keys!"
+          const goLine =
+            state.battleKey === "memory"
+              ? "AWAKE — cut through the fog!"
               : "GO — juice the crowd!";
+          hudMsg.textContent =
+            n >= 1 ? "Countdown: " + n + " — warm up those keys!" : goLine;
         }
       }
       render(nowS);
@@ -915,6 +1134,7 @@
   }
 
   function openBriefing() {
+    fillBriefing();
     if (!briefing) {
       openBattle();
       return;
