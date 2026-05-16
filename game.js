@@ -86,6 +86,7 @@
       pullsSinceFourPlus,
       totalPulls,
     });
+    if (typeof SaveSession !== "undefined") SaveSession.schedulePersist();
   }
 
   function renderStars(rarity) {
@@ -157,6 +158,7 @@
   function unlockMany(chars) {
     chars.forEach((c) => Starfall.Unlocks.unlockCharacter(c));
     renderOwnedRoster();
+    if (typeof SaveSession !== "undefined") SaveSession.schedulePersist();
   }
 
   function runWarpReveal(finalChar, onDone) {
@@ -277,5 +279,20 @@
   });
   els.pullTen.addEventListener("click", () => {
     void doPull(10);
+  });
+
+  window.addEventListener("starfall-local-reset", () => {
+    try {
+      const p = Starfall.Persistence.loadPity();
+      pullsSinceFive = p.pullsSinceFive;
+      pullsSinceFourPlus = p.pullsSinceFourPlus;
+      totalPulls = p.totalPulls;
+    } catch (_) {
+      pullsSinceFive = 0;
+      pullsSinceFourPlus = 0;
+      totalPulls = 0;
+    }
+    hud();
+    renderOwnedRoster();
   });
 })();

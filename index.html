@@ -15,14 +15,31 @@
   <body>
     <div class="crt-overlay" aria-hidden="true"></div>
 
-    <div class="story-app">
+    <div id="story-app" class="story-app">
       <main class="game-shell">
         <header class="story-top-bar">
           <span class="chapter-pill">Ch. 1 — The Golden District</span>
-          <span class="story-hint">Space — next · ← / Backspace — back</span>
+          <span id="top-phase-hint" class="story-hint"></span>
         </header>
 
-        <section id="screen-name" class="screen screen--active" aria-label="Name entry">
+        <section id="screen-save" class="screen screen-save" aria-label="Pick a save crystal">
+          <div class="save-shelf">
+            <header class="save-shelf__head">
+              <h1 class="save-shelf__title">Snoozing saves</h1>
+              <p class="save-shelf__sub">
+                Three crystal slots · Whisper your pick · Butterbase holds the fluff in the clouds
+              </p>
+              <div
+                id="save-shelf-auth"
+                class="save-shelf__auth"
+                aria-live="polite"
+              ></div>
+            </header>
+            <div id="save-shelf-panel" class="save-shelf__grid"></div>
+          </div>
+        </section>
+
+        <section id="screen-name" class="screen" aria-label="Name entry" hidden>
           <div class="name-card">
             <h1 class="title">Starfall Reverie</h1>
             <p class="subtitle">A traveler arrives where everything is sweet…</p>
@@ -36,6 +53,17 @@
               placeholder="Traveler"
             />
             <button id="btn-begin" type="button" class="story-btn story-btn-primary">Begin</button>
+            <button id="btn-slot-change" type="button" class="story-btn story-btn-ghost btn-change-slot">
+              Different crystal…
+            </button>
+            <button
+              id="btn-name-save-quit"
+              type="button"
+              class="story-btn story-btn-ghost btn-change-slot btn-name-save-quit"
+              title="Save to cloud and return to save crystals"
+            >
+              Save &amp; quit to crystals
+            </button>
           </div>
         </section>
 
@@ -49,6 +77,14 @@
             <div class="dialogue-actions">
               <button id="btn-back" type="button" class="story-btn story-btn-ghost">Back</button>
               <button id="btn-advance" type="button" class="story-btn">Next</button>
+              <button
+                id="btn-save-quit"
+                type="button"
+                class="story-btn story-btn-ghost btn-save-quit"
+                title="Save to cloud and return to save crystals"
+              >
+                Save &amp; quit to crystals
+              </button>
             </div>
           </div>
         </section>
@@ -140,6 +176,8 @@
     </dialog>
 
     <script src="shared/starfall.js"></script>
+    <script src="shared/butterbase-config.js"></script>
+    <script src="js/save-session.js"></script>
     <script src="game.js"></script>
     <script src="js/intro.js" defer></script>
     <script src="js/gacha-modal.js" defer></script>
