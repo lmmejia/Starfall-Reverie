@@ -32,10 +32,11 @@
     pullOne: /** @type {HTMLButtonElement} */ (document.getElementById("pull-one")),
     pullTen: /** @type {HTMLButtonElement} */ (document.getElementById("pull-ten")),
     rosterGrid: /** @type {HTMLElement} */ (document.getElementById("roster-grid")),
+    currency: /** @type {HTMLElement} */ (document.getElementById("currency")),
   };
 
   function pool(rarity) {
-    return Starfall.getRoster().filter((c) => c.rarity === rarity);
+    return Starfall.getGachaRoster().filter((c) => c.rarity === rarity);
   }
 
   function randomFromPool(rarity, rnd) {
@@ -129,7 +130,19 @@
     if (!skipBurst && !teaser) flashBurst(char.rarity);
   }
 
+  function refreshPullButtons() {
+    const cur = Starfall.Persistence.loadCurrency().stardust;
+    const c1 = Starfall.WISH_COST_SINGLE;
+    const c10 = Starfall.WISH_COST_TEN;
+    els.pullOne.disabled = warpBusy || cur < c1;
+    els.pullTen.disabled = warpBusy || cur < c10;
+  }
+
   function hud() {
+    const snap = Starfall.Persistence.loadCurrency();
+    els.currency.textContent = String(snap.stardust);
+    refreshPullButtons();
+
     const toFive = Math.max(0, 80 - pullsSinceFive);
     els.pityFive.textContent = String(toFive);
     els.pityFour.textContent = String(pullsSinceFourPlus);
@@ -157,6 +170,9 @@
   function unlockMany(chars) {
     chars.forEach((c) => Starfall.Unlocks.unlockCharacter(c));
     renderOwnedRoster();
+    try {
+      window.dispatchEvent(new CustomEvent("starfall-roster-changed"));
+    } catch (_) {}
   }
 
   function runWarpReveal(finalChar, onDone) {
@@ -165,7 +181,7 @@
     let nextSwapAt = start;
     let swapGapMs = 30;
 
-    paintResult(Starfall.pickRandom(Starfall.getRoster(), Math.random), {
+    paintResult(Starfall.pickRandom(Starfall.getGachaRoster(), Math.random), {
       teaser: true,
       skipBurst: true,
     });
@@ -186,7 +202,7 @@
       if (now >= nextSwapAt) {
         const stillChaos = progress < 0.84;
         const display = stillChaos
-          ? Starfall.pickRandom(Starfall.getRoster(), Math.random)
+          ? Starfall.pickRandom(Starfall.getGachaRoster(), Math.random)
           : finalChar;
         paintResult(display, { teaser: true, skipBurst: true });
         swapGapMs = 24 + Math.pow(progress, 2.35) * 540;
@@ -199,19 +215,14 @@
     requestAnimationFrame(frame);
   }
 
-  function setWarpButtonsDisabled(disabled) {
-    els.pullOne.disabled = disabled;
-    els.pullTen.disabled = disabled;
-  }
-
   /** @returns {Promise<void>} */
   function waitReveal(finalChar) {
     return new Promise((resolve) => {
       warpBusy = true;
-      setWarpButtonsDisabled(true);
+      refreshPullButtons();
       runWarpReveal(finalChar, () => {
         warpBusy = false;
-        setWarpButtonsDisabled(false);
+        hud();
         resolve();
       });
     });
@@ -219,6 +230,14 @@
 
   async function doPull(times) {
     if (warpBusy) return;
+
+    const cost = times === 10 ? Starfall.WISH_COST_TEN : Starfall.WISH_COST_SINGLE;
+    const cur = Starfall.Persistence.loadCurrency();
+    if (cur.stardust < cost) {
+      hud();
+      return;
+    }
+    Starfall.Persistence.saveCurrency({ stardust: cur.stardust - cost });
 
     const results = [];
     for (let i = 0; i < times; i++) {
@@ -238,7 +257,7 @@
   function renderOwnedRoster() {
     if (!els.rosterGrid) return;
     els.rosterGrid.innerHTML = "";
-    Starfall.getRoster().forEach((char) => {
+    Starfall.getGachaRoster().forEach((char) => {
       const cell = document.createElement("article");
       cell.className =
         "roster-cell r" +
@@ -267,6 +286,11 @@
       els.rosterGrid.appendChild(cell);
     });
   }
+
+  window.addEventListener("starfall-stardust-changed", () => {
+    hud();
+    renderOwnedRoster();
+  });
 
   paintResult(pool(5)[1], { skipBurst: true });
   hud();

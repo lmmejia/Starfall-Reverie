@@ -640,6 +640,20 @@ body {
   background: linear-gradient(180deg, #ffe6a8 0%, #ffd2e8 50%, #c9fff3 100%);
 }
 
+.scene-backdrop[data-scene="evening"] {
+  background: linear-gradient(185deg, #4a2c68 0%, #ff8fb5 35%, #ffd86b 70%, #2a1838 100%);
+}
+
+.scene-backdrop[data-scene="tram"] {
+  background: linear-gradient(180deg, #ffb8d9 0%, #fff0c9 45%, #7fd9ff 100%);
+  opacity: 1;
+}
+
+.scene-backdrop[data-scene="stage"] {
+  background: radial-gradient(ellipse 120% 80% at 50% 20%, #fff8e8 0%, transparent 55%),
+    linear-gradient(180deg, #1a0f28 0%, #4c3068 40%, #ffd0e8 100%);
+}
+
 .dialogue-box {
   width: min(720px, 100%);
   background: var(--story-panel);
@@ -879,4 +893,576 @@ body {
   .gacha-modal .shell {
     font-size: clamp(12px, 2.8vw, 15px);
   }
+}
+
+/* --- Story: boss CTA --- */
+.story-boss-row {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* --- Boss fight modal --- */
+.boss-modal {
+  width: min(420px, calc(100vw - 20px));
+  max-height: calc(100vh - 16px);
+  overflow: hidden;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--story-text, #fff8f0);
+}
+
+.boss-modal::backdrop {
+  background: rgb(8 5 16 / 0.78);
+  backdrop-filter: blur(2px);
+}
+
+.boss-modal-panel {
+  background: var(--story-bg, #1a1228);
+  border: 3px solid var(--story-panel-edge, #f6d46b);
+  border-radius: 10px;
+  box-shadow: 0 16px 48px rgb(0 0 0 / 0.55);
+  overflow: hidden;
+}
+
+.boss-modal-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--story-panel, #2d1f3d);
+  border-bottom: 2px solid var(--line, #3d2f5c);
+}
+
+.boss-head-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.boss-modal-title {
+  margin: 0 0 6px;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(9px, 2.2vw, 11px);
+  color: var(--story-panel-edge, #f6d46b);
+  letter-spacing: 0.04em;
+}
+
+.boss-phase-label {
+  margin: 0;
+  font-family: "VT323", system-ui, sans-serif;
+  font-size: clamp(17px, 2.4vw, 22px);
+  color: var(--story-muted, #c9b8d9);
+}
+
+#boss-conductor-portrait {
+  width: 56px;
+  height: 56px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  border: 2px solid var(--line);
+  flex-shrink: 0;
+}
+
+.boss-modal-close {
+  font-family: "Press Start 2P", monospace;
+  font-size: 14px;
+  line-height: 1;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: var(--radius);
+  border: 2px solid var(--line);
+  background: var(--panel, #1f1633);
+  color: var(--muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.boss-body {
+  position: relative;
+  padding: 12px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: min(85vh, 720px);
+  overflow-y: auto;
+}
+
+.boss-gacha-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgb(0 0 0 / 0.28);
+  border: 2px solid var(--line, #3d2f5c);
+  border-radius: 8px;
+}
+
+.boss-stardust-pill {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--story-panel, #2d1f3d);
+  border: 1px solid var(--story-panel-edge, #f6d46b);
+}
+
+.boss-stardust-label {
+  font-family: "Press Start 2P", monospace;
+  font-size: 6px;
+  color: var(--story-muted, #c9b8d9);
+  letter-spacing: 0.06em;
+}
+
+.boss-stardust-amt {
+  font-family: "VT323", system-ui, sans-serif;
+  font-size: clamp(20px, 3vw, 26px);
+  color: var(--story-accent-2, #7ee8ff);
+}
+
+.boss-ally-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+#boss-ally-portrait {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  border: 2px solid var(--line);
+  border-radius: 4px;
+  background: #120b1a;
+}
+
+.boss-ally-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  font-family: "VT323", system-ui, sans-serif;
+  font-size: clamp(14px, 2vw, 17px);
+  color: var(--story-muted, #c9b8d9);
+}
+
+.boss-ally-label-text {
+  font-family: "Press Start 2P", monospace;
+  font-size: 6px;
+  letter-spacing: 0.08em;
+}
+
+.boss-ally-select {
+  width: 100%;
+  max-width: 220px;
+  padding: 6px 8px;
+  font-family: "VT323", system-ui, sans-serif;
+  font-size: clamp(15px, 2.1vw, 18px);
+  color: var(--story-text, #fff8f0);
+  background: var(--story-bg, #1a1228);
+  border: 2px solid var(--line);
+  border-radius: 6px;
+}
+
+.boss-ally-hint {
+  margin: -4px 0 0;
+  font-family: "VT323", system-ui, sans-serif;
+  font-size: clamp(13px, 1.9vw, 16px);
+  line-height: 1.35;
+  color: var(--story-muted, #c9b8d9);
+  text-align: center;
+}
+
+.boss-arena-block {
+  position: relative;
+  width: 360px;
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+.boss-victory[hidden],
+.boss-defeat[hidden] {
+  display: none !important;
+}
+
+.boss-victory {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgb(12 8 22 / 0.88);
+  backdrop-filter: blur(3px);
+  z-index: 3;
+  border-radius: 6px;
+}
+
+.boss-victory-card {
+  text-align: center;
+  max-width: 280px;
+  padding: 16px 14px 14px;
+  background: var(--story-panel, #2d1f3d);
+  border: 2px solid var(--story-panel-edge, #f6d46b);
+  border-radius: 8px;
+  box-shadow: 0 12px 36px rgb(0 0 0 / 0.45);
+}
+
+.boss-victory-eyebrow {
+  margin: 0 0 6px;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(7px, 1.8vw, 9px);
+  letter-spacing: 0.12em;
+  color: var(--story-accent, #ff7eb9);
+}
+
+.boss-victory-title {
+  margin: 0 0 10px;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(9px, 2.2vw, 11px);
+  line-height: 1.45;
+  color: var(--story-panel-edge, #f6d46b);
+}
+
+.boss-victory-blurb {
+  margin: 0 0 14px;
+  font-family: "VT323", system-ui, sans-serif;
+  font-size: clamp(16px, 2.3vw, 20px);
+  line-height: 1.35;
+  color: var(--story-text, #fff8f0);
+}
+
+.boss-victory-reward {
+  margin: 0 0 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  font-family: "VT323", system-ui, sans-serif;
+  font-size: clamp(17px, 2.4vw, 22px);
+  color: var(--story-accent-2, #7ee8ff);
+}
+
+.boss-victory-reward-label {
+  color: var(--story-muted, #c9b8d9);
+  font-size: 0.9em;
+}
+
+.boss-victory-reward-amt {
+  font-size: 1.15em;
+}
+
+.boss-victory-reward-unit {
+  color: var(--story-muted, #c9b8d9);
+  font-size: 0.85em;
+}
+
+.boss-victory-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.boss-defeat {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgb(8 6 18 / 0.92);
+  backdrop-filter: blur(3px);
+  z-index: 4;
+  border-radius: 6px;
+}
+
+.boss-defeat-card {
+  text-align: center;
+  max-width: 280px;
+  padding: 16px 14px 14px;
+  background: var(--story-panel, #2d1f3d);
+  border: 2px solid rgb(255 110 140 / 0.65);
+  border-radius: 8px;
+  box-shadow: 0 12px 36px rgb(0 0 0 / 0.5);
+}
+
+.boss-defeat-eyebrow {
+  margin: 0 0 6px;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(7px, 1.8vw, 9px);
+  letter-spacing: 0.12em;
+  color: rgb(255 150 170 / 0.95);
+}
+
+.boss-defeat-title {
+  margin: 0 0 10px;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(9px, 2.2vw, 11px);
+  line-height: 1.45;
+  color: var(--story-panel-edge, #f6d46b);
+}
+
+.boss-defeat-blurb {
+  margin: 0 0 16px;
+  font-family: "VT323", system-ui, sans-serif;
+  font-size: clamp(16px, 2.3vw, 20px);
+  line-height: 1.35;
+  color: var(--story-text, #fff8f0);
+}
+
+.boss-defeat-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.boss-howto {
+  background: rgb(0 0 0 / 0.35);
+  border: 2px solid var(--story-panel-edge, #f6d46b);
+  border-radius: 8px;
+  padding: 10px 12px 12px;
+  margin: 0;
+}
+
+.boss-howto-title {
+  margin: 0 0 8px;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(8px, 2vw, 10px);
+  color: var(--story-panel-edge, #f6d46b);
+  letter-spacing: 0.04em;
+}
+
+.boss-howto-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-family: "VT323", system-ui, sans-serif;
+  font-size: clamp(15px, 2.2vw, 19px);
+  line-height: 1.35;
+  color: var(--story-text, #fff8f0);
+}
+
+.boss-howto-list li {
+  margin-bottom: 8px;
+}
+
+.boss-howto-foot {
+  margin: 8px 0 0;
+  font-family: "VT323", system-ui, sans-serif;
+  font-size: clamp(14px, 2vw, 18px);
+  color: var(--story-accent-2, #7ee8ff);
+  line-height: 1.3;
+}
+
+.boss-howto-foot kbd {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.65em;
+  padding: 2px 6px;
+  border: 1px solid var(--story-muted, #c9b8d9);
+  border-radius: 4px;
+  background: rgb(0 0 0 / 0.35);
+}
+
+/* --- Boss briefing (instructions before arena) --- */
+.boss-briefing-modal {
+  width: min(460px, calc(100vw - 24px));
+  max-height: calc(100vh - 20px);
+  overflow: auto;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--story-text, #fff8f0);
+}
+
+.boss-briefing-modal::backdrop {
+  background: rgb(8 5 16 / 0.82);
+  backdrop-filter: blur(2px);
+}
+
+.boss-briefing-panel {
+  background: var(--story-bg, #1a1228);
+  border: 3px solid var(--story-panel-edge, #f6d46b);
+  border-radius: 10px;
+  box-shadow: 0 16px 48px rgb(0 0 0 / 0.55);
+  padding: 14px 16px 16px;
+}
+
+.boss-briefing-title {
+  margin: 0 0 8px;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(10px, 2.4vw, 12px);
+  color: var(--story-panel-edge, #f6d46b);
+  letter-spacing: 0.04em;
+}
+
+.boss-briefing-lead {
+  margin: 0 0 12px;
+  font-family: "VT323", system-ui, sans-serif;
+  font-size: clamp(16px, 2.3vw, 20px);
+  line-height: 1.35;
+  color: var(--story-muted, #c9b8d9);
+}
+
+.boss-howto--briefing {
+  margin-bottom: 12px;
+}
+
+.boss-briefing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.boss-hint kbd {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.65em;
+  padding: 2px 6px;
+  border: 1px solid var(--story-muted, #c9b8d9);
+  border-radius: 4px;
+  background: rgb(0 0 0 / 0.35);
+}
+
+.boss-hud-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.boss-hp-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.boss-hp-cap {
+  font-family: "Press Start 2P", monospace;
+  font-size: 7px;
+  width: 52px;
+  color: var(--muted, #9b86c9);
+  flex-shrink: 0;
+}
+
+.boss-hp-track {
+  flex: 1;
+  height: 12px;
+  background: rgb(0 0 0 / 0.4);
+  border: 2px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.boss-hp-fill {
+  height: 100%;
+  width: 100%;
+  transition: width 120ms ease-out;
+}
+
+.boss-hp-boss {
+  background: linear-gradient(180deg, #ff6b9d, #c44d6a);
+}
+
+.boss-hp-you {
+  background: linear-gradient(180deg, #7ee8ff, #3b8fb8);
+}
+
+.boss-hype-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+.boss-hype-label {
+  font-family: "Press Start 2P", monospace;
+  font-size: 7px;
+  width: 44px;
+  color: var(--story-accent, #ff7eb9);
+  flex-shrink: 0;
+}
+
+.boss-hype-track {
+  flex: 1;
+  height: 10px;
+  border-radius: 4px;
+  border: 2px solid var(--line);
+  background: rgb(0 0 0 / 0.45);
+  overflow: hidden;
+}
+
+.boss-hype-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ff7eb9, #ffe08a, #7ee8ff);
+  transition: width 90ms ease-out;
+  box-shadow: 0 0 10px rgb(255 126 185 / 0.45);
+}
+
+.boss-streak-label {
+  font-family: "Press Start 2P", monospace;
+  font-size: 7px;
+  color: var(--story-panel-edge, #f6d46b);
+  min-width: 72px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+#boss-canvas {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  display: block;
+  border: 3px solid var(--line);
+  border-radius: 6px;
+  image-rendering: pixelated;
+  background: #120b1a;
+}
+
+.boss-fight-msg {
+  margin: 0;
+  min-height: 1.4em;
+  font-family: "VT323", system-ui, sans-serif;
+  font-size: clamp(18px, 2.5vw, 24px);
+  color: var(--story-accent-2, #7ee8ff);
+  text-align: center;
+}
+
+.boss-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.boss-hint {
+  margin: 0;
+  font-family: "VT323", system-ui, sans-serif;
+  font-size: clamp(14px, 2vw, 18px);
+  color: var(--story-muted, #c9b8d9);
+  line-height: 1.35;
+  text-align: center;
+}
+
+.boss-hint kbd {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.65em;
+  padding: 2px 6px;
+  border: 1px solid var(--story-muted, #c9b8d9);
+  border-radius: 4px;
+  background: rgb(0 0 0 / 0.35);
 }
