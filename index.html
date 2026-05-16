@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Starfall Reverie — Warp Terminal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="crt-overlay" aria-hidden="true"></div>
+    <main class="shell">
+      <header class="top">
+        <div class="brand">
+          <span class="spark">✦</span>
+          Starfall Reverie
+        </div>
+        <div class="top-stats">
+          <div class="pill" title="Imaginary pulls — demo currency">
+            <span class="label">Stardust Links</span>
+            <strong id="currency">∞</strong>
+          </div>
+          <div class="pill" title="Pulls until 5★ pity">
+            <span class="label">To 5★</span>
+            <strong id="pity-five">80</strong>
+          </div>
+          <div class="pill" title="Pulls since last 4★ or higher">
+            <span class="label">Since 4★+</span>
+            <strong id="pity-four">0</strong>
+          </div>
+          <div class="pill muted">
+            <span class="label">Total pulls</span>
+            <strong id="total-pulls">0</strong>
+          </div>
+        </div>
+      </header>
+
+      <section class="stage" aria-live="polite">
+        <div class="warp-card" id="result-card">
+          <canvas id="portrait" width="96" height="96" aria-hidden="true"></canvas>
+          <div class="stars" id="stars-row" aria-label=""></div>
+          <h2 class="char-name" id="char-name">Ready to warp</h2>
+          <p class="tagline" id="tagline">Cute destinies behind every startrail.</p>
+        </div>
+        <div class="burst" id="burst" aria-hidden="true"></div>
+      </section>
+
+      <div class="actions">
+        <button type="button" class="btn primary" id="pull-one">
+          Warp ×1
+        </button>
+        <button type="button" class="btn" id="pull-ten">
+          Warp ×10
+        </button>
+      </div>
+
+      <details class="vault-panel">
+        <summary>Unlocked roster (for battles)</summary>
+        <p class="vault-hint">
+          Same sprites as gacha · your friend&apos;s combat page can load
+          <code>shared/starfall.js</code> and call
+          <code>Starfall.drawPortrait(canvas, Starfall.getCharacter(id))</code>.
+        </p>
+        <div class="roster-grid" id="roster-grid" aria-live="polite"></div>
+      </details>
+
+      <details class="log-panel" open>
+        <summary>Recent warps</summary>
+        <ul class="warp-log" id="warp-log"></ul>
+      </details>
+
+      <footer class="footnote">
+        Pity demo: guaranteed <strong>4★</strong> by the 10th pull without one;
+        guaranteed <strong>5★</strong> on the 80th pull since your last 5★.
+      </footer>
+    </main>
+    <script src="shared/starfall.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>
